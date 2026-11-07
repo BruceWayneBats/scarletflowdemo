@@ -1,0 +1,68 @@
+---
+/** Loss estimate, the same formula as app/services/loss_calculator.py in the main project. */
+import { url } from "../config";
+const fields = [
+  { id: "leads", label: "Обращений в месяц", hint: "Звонки и сообщения вместе", value: 300, min: 0, max: 100000, step: 1, suffix: "" },
+  { id: "lost", label: "Доля потерянных, %", hint: "Без ответа, с поздним ответом, без продолжения", value: 15, min: 0, max: 100, step: 1, suffix: "%" },
+  { id: "conv", label: "Конверсия в визит, %", hint: "Сколько обработанных обращений доходит до приёма", value: 35, min: 0, max: 100, step: 1, suffix: "%" },
+  { id: "check", label: "Средний чек, ₽", hint: "", value: 9000, min: 0, max: 10000000, step: 100, suffix: "₽" },
+  { id: "budget", label: "Рекламный бюджет в месяц, ₽", hint: "Необязательно", value: 150000, min: 0, max: 100000000, step: 1000, suffix: "₽" },
+];
+---
+<form class="calc card" data-calc aria-describedby="calc-note" onsubmit="return false">
+  <div class="inputs">
+    {fields.map((f) => (
+      <div class="field">
+        <label for={`c-${f.id}`}>{f.label}</label>
+        <input class="input" id={`c-${f.id}`} name={f.id} type="number" inputmode="numeric"
+          value={f.value} min={f.min} max={f.max} step={f.step} />
+        {f.hint && <span class="hint">{f.hint}</span>}
+      </div>
+    ))}
+  </div>
+  <div class="result" aria-live="polite">
+    <p class="eyebrow">Оценка потерь в месяц</p>
+    <p class="big" data-out="revenue">≈ 141 750 ₽</p>
+    <dl>
+      <div><dt>Потерянных обращений</dt><dd data-out="leads">45</dd></div>
+      <div><dt>Рекламы ушло на потерянных</dt><dd data-out="budget">≈ 22 500 ₽</dd></div>
+    </dl>
+    <p class="note" id="calc-note">Это оценка: потерянные × конверсия × средний чек. Реальные цифры покажет аудит.</p>
+    <a class="btn btn--primary" href={url("/#audit")}>Получить аудит потерь</a>
+  </div>
+</form>
+<script>
+  const form = document.querySelector<HTMLFormElement>("[data-calc]");
+  const rub = (n: number) => `≈ ${Math.round(n).toLocaleString("ru-RU")} ₽`;
+  function num(name: string, max: number): number {
+    const el = form!.elements.namedItem(name) as HTMLInputElement;
+    const v = Number(el.value);
+    return Number.isFinite(v) ? Math.min(Math.max(v, 0), max) : 0;
+  }
+  function render() {
+    const leads = num("leads", 100000);
+    const lost = num("lost", 100) / 100;
+    const conv = num("conv", 100) / 100;
+    const check = num("check", 10000000);
+    const budget = num("budget", 100000000);
+    const lostLeads = leads * lost;
+    const out = (k: string) => form!.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
+    out("revenue").textContent = rub(lostLeads * conv * check);
+    out("leads").textContent = lostLeads.toLocaleString("ru-RU", { maximumFractionDigits: 1 });
+    out("budget").textContent = budget > 0 && leads > 0 ? rub((budget / leads) * lostLeads) : "—";
+  }
+  form?.addEventListener("input", render);
+</script>
+<style>
+  .calc { display: grid; gap: var(--s-6); padding: clamp(20px, 4vw, 40px); background: var(--paper); box-shadow: var(--shadow); }
+  @media (min-width: 900px) { .calc { grid-template-columns: 1.2fr 1fr; } }
+  .inputs { display: grid; gap: 0 var(--s-4); grid-template-columns: 1fr 1fr; align-items: start; }
+  .inputs .field:first-child { grid-column: 1 / -1; }
+  .inputs .hint { font-size: .8rem; }
+  .result { background: var(--paper-2); border-radius: var(--r-2); padding: var(--s-5); align-self: start; }
+  .big { font: 600 clamp(2.25rem, 1.6rem + 2.4vw, 3.25rem)/1.05 var(--font-display); font-variant-numeric: lining-nums; color: var(--vermilion-ink); margin-bottom: var(--s-4); }
+  dl { margin: 0 0 var(--s-4); display: grid; gap: var(--s-2); }
+  dl div { display: flex; justify-content: space-between; gap: var(--s-4); border-bottom: var(--hairline); padding-bottom: var(--s-2); }
+  dt { color: var(--ink-2); }
+  dd { margin: 0; font-weight: 600; }
+</style>

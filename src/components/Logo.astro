@@ -1,0 +1,12 @@
+---
+import Mark from "./Mark.astro";
+import { url } from "../config";
+---
+<a class="logo" href={url("/")} aria-label="ScarletFlow — на главную">
+  <Mark size={36} />
+  <span>ScarletFlow</span>
+</a>
+<style>
+  .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+  .logo span { font: 600 1.6rem/1 var(--font-display); letter-spacing: .01em; }
+</style>

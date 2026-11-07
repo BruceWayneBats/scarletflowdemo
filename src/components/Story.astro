@@ -1,0 +1,110 @@
+---
+/**
+ * "Automation walks the business along": three line drawings in vermilion on paper.
+ * The frames fade in on scroll (CSS + IntersectionObserver); without JS or with reduced
+ * motion they are simply shown.
+ */
+---
+<ol class="story" aria-label="Как помощник подхватывает ночное обращение">
+  <li class="frame">
+    <figure>
+      <svg viewBox="0 0 300 220" role="img" aria-labelledby="f1">
+        <title id="f1">Ночь: на столе звонит телефон, кресло пустое, за окном луна</title>
+        <g fill="none" stroke="#c8322a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="196" y="22" width="78" height="62" rx="4" />
+          <path d="M235 22v62M196 53h78" stroke-width="1.4" />
+          <path d="M256 32a11 11 0 1 0 9 17a9 9 0 1 1-9-17z" fill="#c8322a" stroke="none" />
+          <path d="M24 150h168M36 150v52M180 150v52" />
+          <rect x="84" y="114" width="24" height="36" rx="5" fill="#fbf6ec" />
+          <path d="M90 121h12" stroke-width="1.6" />
+          <path d="M74 120q-7 11 0 22M66 114q-11 17 0 34M118 120q7 11 0 22M126 114q11 17 0 34" stroke-width="1.8" />
+          <path d="M214 150h50M218 150l-6 52M258 150l6 52M256 150l4-54M250 96h18" />
+          <path d="M24 202h252" stroke-width="1.2" />
+        </g>
+        <text x="200" y="104" fill="#a82820" font-family="Manrope, sans-serif" font-size="13" font-weight="600">23:40</text>
+      </svg>
+      <figcaption><span>1</span>Ночь. Пациент звонит, а в клинике уже никого нет.</figcaption>
+    </figure>
+  </li>
+  <li class="frame">
+    <figure>
+      <svg viewBox="0 0 300 220" role="img" aria-labelledby="f2">
+        <title id="f2">Маленький помощник-телефон берёт за руку крупную фигуру владельца</title>
+        <g fill="none" stroke="#c8322a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="104" cy="46" r="17" />
+          <path d="M104 64c-20 2-26 22-25 56l3 82M104 64c20 2 26 22 25 56l-3 82" />
+          <path d="M96 202h-14M126 202h14M104 120v82" stroke-width="2" />
+          <path d="M127 80c8 14 14 32 22 50" />
+          <circle cx="152" cy="134" r="4.5" fill="#c8322a" />
+          <rect x="164" y="112" width="36" height="54" rx="9" fill="#fbf6ec" />
+          <path d="M170 122h24v26h-24z" stroke-width="1.4" />
+          <path d="M176 140q6 5 12 0" stroke-width="1.8" />
+          <path d="M165 128q-6 2-10 6M174 166l-4 24M190 166l4 24M200 132q8 4 10 14" />
+        </g>
+        <g fill="#c8322a"><circle cx="177" cy="131" r="2" /><circle cx="187" cy="131" r="2" /></g>
+        <g fill="none" stroke="#7a5a43" stroke-width="1.4">
+          <path d="M196 64h78a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8h-60l-12 12v-12h-6a8 8 0 0 1-8-8V72a8 8 0 0 1 8-8z" fill="#fbf6ec" />
+        </g>
+        <text x="206" y="88" fill="#1f1a17" font-family="Manrope, sans-serif" font-size="13" font-weight="600">Я на связи</text>
+        <path d="M24 202h252" stroke="#c8322a" stroke-width="1.2" />
+      </svg>
+      <figcaption><span>2</span>Помощник отвечает за минуту и бережно ведёт разговор дальше.</figcaption>
+    </figure>
+  </li>
+  <li class="frame">
+    <figure>
+      <svg viewBox="0 0 300 220" role="img" aria-labelledby="f3">
+        <title id="f3">Владелец и помощник вместе идут к доске с записями и отчётом</title>
+        <g fill="none" stroke="#c8322a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="66" cy="50" r="15" />
+          <path d="M66 66c-17 2-22 20-21 50l4 40M66 66c17 2 22 20 21 50l-3 40" />
+          <path d="M58 156l-8 46M76 156l10 46" stroke-width="2" />
+          <path d="M86 84c6 12 12 26 18 40" />
+          <circle cx="107" cy="127" r="4" fill="#c8322a" />
+          <rect x="116" y="114" width="30" height="46" rx="8" fill="#fbf6ec" />
+          <path d="M126 140q5 4 10 0" stroke-width="1.6" />
+          <path d="M117 124q-5 0-8 3M124 160l-5 22M138 160l7 22" />
+          <path d="M18 104h20M12 122h22M20 140h14" stroke="#7a5a43" stroke-width="1.4" />
+          <rect x="182" y="34" width="96" height="128" rx="6" fill="#fbf6ec" />
+          <path d="M182 56h96" stroke-width="1.4" />
+          <path d="M194 72l4 4 8-8M214 72h50M194 92l4 4 8-8M214 92h42M194 112l4 4 8-8M214 112h46" stroke-width="1.8" />
+          <path d="M200 150v-14M220 150v-22M240 150v-18M260 150v-30" stroke-width="5" />
+          <path d="M230 162v40M218 202h24M24 202h252" stroke-width="1.6" />
+        </g>
+        <g fill="#c8322a"><circle cx="127" cy="131" r="1.8" /><circle cx="135" cy="131" r="1.8" /></g>
+      </svg>
+      <figcaption><span>3</span>Утром — записи в расписании и понятный отчёт о том, что было ночью.</figcaption>
+    </figure>
+  </li>
+</ol>
+
+<script>
+  // Reveal frames on scroll; everything stays visible without JS or with reduced motion.
+  const frames = document.querySelectorAll<HTMLElement>(".story .frame");
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!still && "IntersectionObserver" in window) {
+    frames.forEach((f) => f.classList.add("hidden"));
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) { e.target.classList.remove("hidden"); io.unobserve(e.target); }
+      }),
+      { threshold: 0.25 },
+    );
+    frames.forEach((f) => io.observe(f));
+  }
+</script>
+
+<style>
+  .story { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-5); counter-reset: f; }
+  @media (min-width: 860px) { .story { grid-template-columns: repeat(3, 1fr); } }
+  .frame { margin: 0; transition: opacity .7s ease, transform .7s ease; }
+  .frame:nth-child(2) { transition-delay: .12s; }
+  .frame:nth-child(3) { transition-delay: .24s; }
+  .frame.hidden { opacity: 0; transform: translateY(14px); }
+  figure { margin: 0; background: var(--paper); border: var(--hairline); border-radius: var(--r-3); padding: var(--s-4); height: 100%; }
+  figcaption { display: flex; gap: var(--s-3); align-items: baseline; margin-top: var(--s-3); color: var(--ink-2); }
+  figcaption span {
+    flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+    font: 600 .8rem/1 var(--font-text); color: var(--vermilion-ink); border: 1px solid var(--vermilion);
+  }
+</style>

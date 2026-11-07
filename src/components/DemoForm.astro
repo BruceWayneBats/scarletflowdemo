@@ -1,0 +1,72 @@
+---
+import { config, url } from "../config";
+const sample = "Консультация стоматолога — 1500\nПрофессиональная гигиена — 6500\nЛечение кариеса — 7000\nИмплантация — 45000";
+---
+<form class="form card" data-demo novalidate data-api={config.apiBase} data-consent={config.consentVersion}>
+  <div class="field">
+    <label for="d-name">Название клиники</label>
+    <input class="input" id="d-name" name="clinic_name" maxlength="60" placeholder="Например, «Улыбка»" aria-describedby="d-name-e" />
+    <span class="error" id="d-name-e" data-error-for="clinic_name"></span>
+  </div>
+  <div class="field">
+    <label for="d-services">Услуги и цены</label>
+    <span class="hint" id="d-services-h">По одной на строку: «Название — цена». До 30 строк. Можно загрузить CSV: название;цена;длительность в минутах.</span>
+    <textarea class="input" id="d-services" name="services" maxlength="4000" placeholder={sample} aria-describedby="d-services-h d-services-e"></textarea>
+    <span class="error" id="d-services-e" data-error-for="services"></span>
+  </div>
+  <div class="field">
+    <label for="d-file">Или файл CSV <span class="muted">(до 20 КБ)</span></label>
+    <input class="input file" id="d-file" type="file" accept=".csv,text/csv,text/plain" />
+  </div>
+  <div class="trap" aria-hidden="true">
+    <label for="d-site">Сайт</label><input id="d-site" name="website" tabindex="-1" autocomplete="off" />
+  </div>
+  <div class="field">
+    <label class="check" for="d-consent">
+      <input type="checkbox" id="d-consent" name="consent" aria-describedby="d-consent-e" />
+      <span>Согласен на <a href={url("/consent/")} target="_blank" rel="noopener">обработку данных</a>, введённых в демо</span>
+    </label>
+    <span class="error" id="d-consent-e" data-error-for="consent"></span>
+  </div>
+  <button class="btn btn--primary" type="submit">Создать демо-бота</button>
+  <p class="note">Демо живёт 3 дня, затем удаляется вместе со всеми данными. Не вводите настоящие данные пациентов.</p>
+  <div class="status" data-status tabindex="-1" role="status"></div>
+</form>
+<script>
+  import { DEMO_MODE_TEXT, maxLen, required, status, validate } from "../lib/forms";
+  const form = document.querySelector<HTMLFormElement>("[data-demo]");
+  const area = form?.querySelector<HTMLTextAreaElement>("#d-services");
+  const LINE = /^(.{2,80}?)\s*[—–\-:;]\s*(\d[\d\s]{0,8})(?:\s*₽|\s*руб\.?)?(?:\s*;\s*\d{2,3})?\s*$/;
+
+  form?.querySelector<HTMLInputElement>("#d-file")?.addEventListener("change", async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file || !area) return;
+    if (file.size > 20_000) { status(form!, "Файл больше 20 КБ"); return; }
+    area.value = (await file.text()).slice(0, 4000);
+  });
+
+  const services = (v: string) => {
+    const lines = v.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    if (!lines.length) return "Добавьте хотя бы одну услугу";
+    if (lines.length > 30) return "Не больше 30 услуг";
+    const bad = lines.findIndex((l) => !LINE.test(l));
+    return bad >= 0 ? `Строка ${bad + 1}: нужно «Название — цена»` : null;
+  };
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const ok = validate(form, {
+      clinic_name: [required("Напишите название клиники"), maxLen(60, "Не больше 60 символов")],
+      services: [services],
+      consent: [required("Нужно согласие")],
+    });
+    if (!ok) return;
+    if (!form.dataset.api) { status(form, DEMO_MODE_TEXT); return; }
+    status(form, "Создаём демо…"); // part B: POST to the backend, then the chat
+  });
+</script>
+<style>
+  .form { background: var(--paper); padding: clamp(20px, 4vw, 36px); box-shadow: var(--shadow); }
+  .file { padding: 10px; }
+  .note { margin: var(--s-3) 0 0; }
+</style>

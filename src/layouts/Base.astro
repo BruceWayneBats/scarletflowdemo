@@ -1,0 +1,52 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { url } from "../config";
+
+interface Props { title: string; description: string; path: string; noindex?: boolean }
+const { title, description, path, noindex = false } = Astro.props;
+const canonical = new URL(url(path), Astro.site).href;
+const og = new URL(url("/og.png"), Astro.site).href;
+const fullTitle = path === "/" ? title : `${title} — ScarletFlow`;
+const ld = {
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "Organization", "@id": `${new URL(url("/"), Astro.site).href}#org`, name: "ScarletFlow",
+      url: new URL(url("/"), Astro.site).href, logo: new URL(url("/favicon.svg"), Astro.site).href },
+    { "@type": "Service", name: "ИИ-администратор заявок для клиник", serviceType: "Обработка обращений и запись пациентов",
+      provider: { "@id": `${new URL(url("/"), Astro.site).href}#org` }, areaServed: "RU", inLanguage: "ru" },
+  ],
+};
+---
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#fbf6ec" />
+    <link rel="icon" href={url("/favicon.svg")} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={url("/apple-touch-icon.png")} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="ScarletFlow" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
+  </head>
+  <body>
+    <a class="skip" href="#main">К содержимому</a>
+    <Header />
+    <main id="main"><slot /></main>
+    <Footer />
+  </body>
+</html>

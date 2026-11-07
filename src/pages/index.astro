@@ -1,0 +1,197 @@
+---
+import Base from "../layouts/Base.astro";
+import Story from "../components/Story.astro";
+import Roles from "../components/Roles.astro";
+import Calculator from "../components/Calculator.astro";
+import AuditForm from "../components/AuditForm.astro";
+import Sakura from "../components/Sakura.astro";
+import Petals from "../components/Petals.astro";
+import Pattern from "../components/Pattern.astro";
+import Mark from "../components/Mark.astro";
+import { faq, hero, problem, security, start, steps } from "../content/home";
+import { url } from "../config";
+---
+<Base
+  title="ScarletFlow — ИИ-администратор заявок для клиник"
+  description="Отвечает пациентам в Telegram, MAX и на сайте за минуту, записывает в расписание и возвращает ночные пропущенные звонки. Владелец видит, где теряются обращения."
+  path="/"
+>
+  <section class="hero">
+    <Pattern />
+    <Petals />
+    <Sakura class="hero-branch" />
+    <div class="container hero-grid">
+      <div>
+        <p class="eyebrow">{hero.eyebrow}</p>
+        <h1>{hero.title}</h1>
+        <p class="lead">{hero.lead}</p>
+        <div class="actions">
+          <a class="btn btn--primary" href={url("/demo/")}>{hero.primary}</a>
+          <a class="btn btn--ghost" href="#calculator">{hero.secondary}</a>
+        </div>
+      </div>
+      <div class="seal" aria-hidden="true"><Mark size={220} /></div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="problem-h">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="problem-h">{problem.title}</h2>
+        <p class="lead">{problem.lead}</p>
+      </div>
+      <div class="grid grid--3">
+        {problem.items.map((i) => <div class="card"><h3 class="h-sm">{i.title}</h3><p class="muted">{i.text}</p></div>)}
+      </div>
+      <div class="example" role="group" aria-label="Пример расчёта">
+        <span class="badge">Пример · оценка</span>
+        <dl>
+          {problem.example.map((e) => <div><dt>{e.label}</dt><dd>{e.value}</dd></div>)}
+        </dl>
+        <p class="note">{problem.note}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper2" aria-labelledby="story-h">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">Как это выглядит</p>
+        <h2 id="story-h">Автоматизация провожает бизнес</h2>
+        <p class="lead">Ночью, в выходные, в час пик — помощник подхватывает обращение, а утром вы видите результат.</p>
+      </div>
+      <Story />
+    </div>
+  </section>
+
+  <section class="section" id="how" aria-labelledby="how-h">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="how-h">Как это работает</h2>
+      </div>
+      <ol class="steps">
+        {steps.map((s, i) => (
+          <li class="card"><span class="num">{i + 1}</span><h3 class="h-sm">{s.title}</h3><p class="muted">{s.text}</p></li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--sakura" aria-labelledby="roles-h">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="roles-h">Что получает каждый</h2>
+      </div>
+      <Roles />
+    </div>
+  </section>
+
+  <section class="section" id="calculator" aria-labelledby="calc-h">
+    <Sakura class="divider" />
+    <div class="container">
+      <div class="section-head">
+        <h2 id="calc-h">Сколько вы теряете</h2>
+        <p class="lead">Подставьте свои цифры. Расчёт идёт прямо на странице и никуда не отправляется.</p>
+      </div>
+      <Calculator />
+    </div>
+  </section>
+
+  <section class="section section--paper2" id="security" aria-labelledby="sec-h">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="sec-h">Безопасность и персональные данные</h2>
+        <p class="lead">Только то, что действительно сделано в сервисе. Подробнее — <a href={url("/security/")}>на странице о безопасности</a>.</p>
+      </div>
+      <div class="grid grid--3">
+        {security.map((s) => (
+          <div class="card">
+            <h3 class="h-sm">{s.title}</h3>
+            <p class="muted">{s.text}</p>
+            {s.todo && <p class="note"><span class="todo">TODO: {s.todo}</span></p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="start" aria-labelledby="start-h">
+    <Pattern />
+    <div class="container">
+      <div class="section-head">
+        <h2 id="start-h">Как мы начинаем</h2>
+        <p class="lead">Сначала считаем ваши потери, потом проверяем на практике, и только потом — подписка.</p>
+      </div>
+      <ol class="plan">
+        {start.map((s) => (
+          <li class="card">
+            <span class="num">{s.step}</span>
+            <h3 class="h-sm">{s.title}</h3>
+            {s.price && <p class="price">{s.price}</p>}
+            <p class="muted">{s.text}</p>
+            {s.todo && <p class="note"><span class="todo">TODO: {s.todo}</span></p>}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--paper2" id="faq" aria-labelledby="faq-h">
+    <div class="container narrow">
+      <h2 id="faq-h">Частые вопросы</h2>
+      {faq.map((f) => (
+        <details class="qa"><summary>{f.q}</summary><p>{f.a}</p></details>
+      ))}
+    </div>
+  </section>
+
+  <section class="section" id="audit" aria-labelledby="audit-h">
+    <div class="container final">
+      <div>
+        <h2 id="audit-h">Узнайте, сколько заявок теряет ваша клиника</h2>
+        <p class="lead">Оставьте контакт — пришлём расчёт и предложим короткий бесплатный аудит. Или сразу попробуйте демо на своих услугах.</p>
+        <a class="btn btn--ghost" href={url("/demo/")}>Попробовать демо</a>
+      </div>
+      <AuditForm />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { position: relative; overflow: hidden; padding: clamp(48px, 9vw, 120px) 0 clamp(56px, 8vw, 104px); }
+  .hero-grid { position: relative; display: grid; gap: var(--s-7); align-items: center; }
+  @media (min-width: 960px) { .hero-grid { grid-template-columns: 1.5fr 1fr; } }
+  .hero h1 { max-width: 17ch; }
+  .hero .lead { margin-bottom: var(--s-6); }
+  .seal { justify-self: center; opacity: .95; display: none; }
+  @media (min-width: 960px) { .seal { display: block; } }
+  :global(.hero-branch) { position: absolute; right: -10px; top: 0; width: min(46vw, 360px); opacity: .9; }
+  @media (max-width: 959px) { :global(.hero-branch) { width: 150px; top: -34px; right: -24px; opacity: .5; } }
+  :global(.divider) { width: 200px; margin: -24px auto var(--s-6); opacity: .8; }
+  .h-sm { font-size: 1.6rem; }
+  .example { margin-top: var(--s-6); padding: var(--s-5); border: 1px dashed var(--brown); border-radius: var(--r-2); }
+  .example dl { display: grid; gap: var(--s-4); margin: var(--s-4) 0; }
+  @media (min-width: 720px) { .example dl { grid-template-columns: repeat(3, 1fr); } }
+  .example dd { margin: 0; font: 600 2rem/1.1 var(--font-display); font-variant-numeric: lining-nums; color: var(--vermilion-ink); order: -1; }
+  .example dl div { display: flex; flex-direction: column; gap: 4px; }
+  .example dt { color: var(--ink-2); font-size: .95rem; }
+  .steps, .plan { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-5); }
+  .steps li + li, .plan li + li { margin-top: 0; }
+  @media (min-width: 720px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1040px) { .steps { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 860px) { .plan { grid-template-columns: repeat(3, 1fr); } }
+  .num {
+    display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--vermilion); color: var(--vermilion-ink); font-weight: 600; margin-bottom: var(--s-4);
+  }
+  .price { font: 600 1.35rem/1.2 var(--font-text); color: var(--ink); }
+  .narrow { max-width: 820px; }
+  .qa { border-bottom: var(--hairline); padding: var(--s-4) 0; }
+  .qa summary { cursor: pointer; font-weight: 600; font-size: 1.1rem; list-style: none; display: flex; justify-content: space-between; gap: var(--s-4); }
+  .qa summary::-webkit-details-marker { display: none; }
+  .qa summary::after { content: "+"; color: var(--vermilion-ink); font-size: 1.4rem; line-height: 1; }
+  .qa[open] summary::after { content: "−"; }
+  .qa p { margin: var(--s-3) 0 0; color: var(--ink-2); max-width: 70ch; }
+  .final { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 960px) { .final { grid-template-columns: 1fr 1.1fr; } }
+</style>

@@ -1,0 +1,73 @@
+---
+import { config, url } from "../config";
+const types = ["Стоматология", "Многопрофильная клиника", "Косметология", "Другое"];
+const budgets = ["До 50 000 ₽", "50 000 – 150 000 ₽", "150 000 – 500 000 ₽", "Больше 500 000 ₽", "Не знаю"];
+---
+<form class="form card" data-audit novalidate data-api={config.apiBase} data-consent={config.consentVersion}>
+  <div class="field">
+    <label for="a-name">Как к вам обращаться</label>
+    <input class="input" id="a-name" name="name" autocomplete="name" maxlength="80" aria-describedby="a-name-e" />
+    <span class="error" id="a-name-e" data-error-for="name"></span>
+  </div>
+  <div class="field">
+    <label for="a-contact">Телефон или Telegram</label>
+    <input class="input" id="a-contact" name="contact" autocomplete="tel" maxlength="40" placeholder="+7 … или @имя" aria-describedby="a-contact-e" />
+    <span class="error" id="a-contact-e" data-error-for="contact"></span>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label for="a-type">Тип клиники</label>
+      <select class="input" id="a-type" name="clinic_type" aria-describedby="a-type-e">
+        <option value="">Выберите</option>
+        {types.map((t) => <option>{t}</option>)}
+      </select>
+      <span class="error" id="a-type-e" data-error-for="clinic_type"></span>
+    </div>
+    <div class="field">
+      <label for="a-city">Город</label>
+      <input class="input" id="a-city" name="city" autocomplete="address-level2" maxlength="60" />
+    </div>
+  </div>
+  <div class="field">
+    <label for="a-budget">Рекламный бюджет в месяц <span class="muted">(необязательно)</span></label>
+    <select class="input" id="a-budget" name="ad_budget">
+      <option value="">Не указывать</option>
+      {budgets.map((b) => <option>{b}</option>)}
+    </select>
+  </div>
+  <div class="trap" aria-hidden="true">
+    <label for="a-site">Сайт</label><input id="a-site" name="website" tabindex="-1" autocomplete="off" />
+  </div>
+  <div class="field">
+    <label class="check" for="a-consent">
+      <input type="checkbox" id="a-consent" name="consent" aria-describedby="a-consent-e" />
+      <span>Согласен на <a href={url("/consent/")} target="_blank" rel="noopener">обработку персональных данных</a> для ответа на заявку</span>
+    </label>
+    <span class="error" id="a-consent-e" data-error-for="consent"></span>
+  </div>
+  <button class="btn btn--primary" type="submit">Получить расчёт и аудит</button>
+  <p class="note">Ответим в течение рабочего дня. Звонить без вашего согласия не будем.</p>
+  <div class="status" data-status tabindex="-1" role="status"></div>
+</form>
+<script>
+  import { DEMO_MODE_TEXT, maxLen, phoneOrTelegram, required, status, validate } from "../lib/forms";
+  const form = document.querySelector<HTMLFormElement>("[data-audit]");
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const ok = validate(form, {
+      name: [required("Напишите, как к вам обращаться"), maxLen(80, "Слишком длинно")],
+      contact: [phoneOrTelegram],
+      clinic_type: [required("Выберите тип клиники")],
+      consent: [required("Без согласия мы не сможем обработать заявку")],
+    });
+    if (!ok) return;
+    if (!form.dataset.api) { status(form, DEMO_MODE_TEXT); return; }
+    status(form, "Отправляем…"); // part B: POST to the backend
+  });
+</script>
+<style>
+  .form { background: var(--paper); padding: clamp(20px, 4vw, 36px); box-shadow: var(--shadow); }
+  .row { display: grid; gap: 0 var(--s-4); }
+  @media (min-width: 560px) { .row { grid-template-columns: 1fr 1fr; } }
+  .note { margin: var(--s-3) 0 0; }
+</style>

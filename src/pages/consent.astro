@@ -1,0 +1,18 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import Prose from "../components/Prose.astro";
+import { config } from "../config";
+import { legal } from "../content/legal";
+---
+<Base title="Согласие на обработку персональных данных" path="/consent/"
+  description="Текст согласия на обработку персональных данных при отправке заявки на сайте ScarletFlow (заготовка).">
+  <PageHero eyebrow="Документ" title="Согласие на обработку персональных данных" lead={`Версия текста: ${config.consentVersion}.`} />
+  <Prose>
+    <p class="warning">Текст-заготовка. Проверить юристом до публикации на рабочем домене.</p>
+    <p>Отправляя форму на сайте, я даю согласие <span class="todo">{legal.pdOperator}</span> на обработку моих персональных данных: имени, номера телефона или имени пользователя Telegram, города и сведений о клинике.</p>
+    <p>Цель обработки: ответ на мою заявку, подготовка расчёта и аудита, связь со мной по заявке.</p>
+    <p>Действия с данными: сбор, запись, хранение, уточнение, использование, удаление. Данные хранятся на серверах в России.</p>
+    <p>Срок действия согласия: <span class="todo">TODO: срок</span>. Согласие можно отозвать, написав на <span class="todo">{legal.email}</span>.</p>
+  </Prose>
+</Base>

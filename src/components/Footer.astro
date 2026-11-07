@@ -1,0 +1,45 @@
+---
+import Logo from "./Logo.astro";
+import Sakura from "./Sakura.astro";
+import { legal } from "../content/legal";
+import { pages } from "../content/nav";
+import { url } from "../config";
+---
+<footer class="footer">
+  <Sakura class="branch" flip />
+  <div class="container cols">
+    <div>
+      <Logo />
+      <p class="muted about">ИИ-администратор заявок для клиник: отвечает пациентам в мессенджерах, записывает и показывает владельцу, где теряются обращения.</p>
+    </div>
+    <nav aria-label="Страницы">
+      <h2 class="h">Страницы</h2>
+      <ul>{pages.map((p) => <li><a href={url(p.href)}>{p.label}</a></li>)}</ul>
+    </nav>
+    <div>
+      <h2 class="h">Документы и контакты</h2>
+      <ul>
+        <li><a href={url("/privacy/")}>Политика обработки персональных данных</a></li>
+        <li><a href={url("/consent/")}>Согласие на обработку персональных данных</a></li>
+        <li><span class="todo">{legal.email}</span></li>
+        <li><span class="todo">{legal.telegram}</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container legal note">
+    <p>© {new Date().getFullYear()} ScarletFlow. <span class="todo">{legal.company}</span>, <span class="todo">{legal.inn}</span>, <span class="todo">{legal.ogrn}</span>, <span class="todo">{legal.address}</span>.</p>
+    <p>Расчёты на сайте — оценка по введённым данным, а не обещание результата.</p>
+  </div>
+</footer>
+<style>
+  .footer { position: relative; background: var(--paper-2); border-top: var(--hairline); padding: var(--s-8) 0 var(--s-6); overflow: hidden; }
+  .branch { position: absolute; right: -20px; top: 10px; width: 240px; opacity: .85; }
+  .cols { display: grid; gap: var(--s-6); position: relative; }
+  @media (min-width: 860px) { .cols { grid-template-columns: 1.3fr 1fr 1fr; } }
+  .about { margin-top: var(--s-4); max-width: 38ch; }
+  .h { font: 600 .8rem/1.4 var(--font-text); letter-spacing: .08em; text-transform: uppercase; color: var(--brown); }
+  ul { list-style: none; padding: 0; }
+  a { color: var(--ink); }
+  .legal { margin-top: var(--s-6); padding-top: var(--s-5); border-top: var(--hairline); }
+  .legal p { margin-bottom: var(--s-2); }
+</style>

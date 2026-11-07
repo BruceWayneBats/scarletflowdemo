@@ -1,0 +1,56 @@
+---
+import { roles } from "../content/home";
+---
+<div class="roles" data-roles>
+  <div class="tabs" role="tablist" aria-label="Кому что" hidden>
+    {roles.map((r, i) => (
+      <button type="button" role="tab" id={`tab-${r.id}`} aria-controls={`panel-${r.id}`}
+        aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>{r.tab}</button>
+    ))}
+  </div>
+  <div class="panels">
+    {roles.map((r) => (
+      <section class="card panel" id={`panel-${r.id}`} role="tabpanel" aria-labelledby={`tab-${r.id}`}>
+        <p class="eyebrow">{r.tab}</p>
+        <h3>{r.title}</h3>
+        <ul>{r.points.map((p) => <li>{p}</li>)}</ul>
+      </section>
+    ))}
+  </div>
+</div>
+<script>
+  // Tabs on wide screens; without JS (or on a phone) the three cards are all shown.
+  const root = document.querySelector<HTMLElement>("[data-roles]");
+  const tabs = root ? [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')] : [];
+  const panels = root ? [...root.querySelectorAll<HTMLElement>('[role="tabpanel"]')] : [];
+  function select(i: number, focus = false) {
+    tabs.forEach((t, k) => { t.setAttribute("aria-selected", String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+    panels.forEach((p, k) => { p.hidden = k !== i; });
+    if (focus) tabs[i].focus();
+  }
+  if (root && tabs.length) {
+    root.classList.add("js");
+    root.querySelector<HTMLElement>('[role="tablist"]')!.hidden = false;
+    select(0);
+    tabs.forEach((t, i) => {
+      t.addEventListener("click", () => select(i));
+      t.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") select((i + 1) % tabs.length, true);
+        if (e.key === "ArrowLeft") select((i - 1 + tabs.length) % tabs.length, true);
+      });
+    });
+  }
+</script>
+<style>
+  .panels { display: grid; gap: var(--s-5); }
+  @media (min-width: 860px) { .roles:not(.js) .panels { grid-template-columns: repeat(3, 1fr); } }
+  .tabs { display: flex; gap: var(--s-2); margin-bottom: var(--s-5); flex-wrap: wrap; }
+  .tabs button {
+    font: 600 1rem/1 var(--font-text); padding: 12px 20px; min-height: 44px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--paper); color: var(--ink); cursor: pointer;
+  }
+  .tabs button[aria-selected="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+  .panel ul { margin-bottom: 0; }
+  .panel { background: var(--paper); }
+  .panel[hidden] { display: none; }
+</style>

@@ -1,0 +1,54 @@
+---
+import Logo from "./Logo.astro";
+import { anchors } from "../content/nav";
+import { url } from "../config";
+---
+<header class="header">
+  <div class="container bar">
+    <Logo />
+    <nav aria-label="Разделы" class="nav">
+      <ul>{anchors.map((a) => <li><a href={url(a.href)}>{a.label}</a></li>)}</ul>
+    </nav>
+    <a class="btn btn--primary cta" href={url("/demo/")}>Попробовать демо</a>
+    <details class="menu">
+      <summary aria-label="Меню"><span></span><span></span><span></span></summary>
+      <nav aria-label="Разделы (меню)">
+        <ul>
+          {anchors.map((a) => <li><a href={url(a.href)}>{a.label}</a></li>)}
+          <li><a href={url("/demo/")}>Попробовать демо</a></li>
+        </ul>
+      </nav>
+    </details>
+  </div>
+</header>
+<style>
+  .header {
+    position: sticky; top: 0; z-index: 50; background: rgb(251 246 236 / .92);
+    backdrop-filter: blur(6px); border-bottom: var(--hairline);
+  }
+  .bar { display: flex; align-items: center; gap: var(--s-5); min-height: 68px; }
+  .nav { margin-left: auto; display: none; }
+  .nav ul, .menu ul { list-style: none; margin: 0; padding: 0; }
+  .nav ul { display: flex; gap: var(--s-5); }
+  .nav li + li, .menu li + li { margin-top: 0; }
+  .nav a { color: var(--ink); text-decoration: none; font-size: .95rem; }
+  .nav a:hover { color: var(--vermilion-ink); }
+  .cta { display: none; min-height: 42px; padding: 8px 18px; }
+  .menu { margin-left: auto; position: relative; }
+  .menu summary {
+    list-style: none; cursor: pointer; width: 44px; height: 44px; display: grid; place-content: center;
+    gap: 5px; border-radius: var(--r-1);
+  }
+  .menu summary::-webkit-details-marker { display: none; }
+  .menu summary span { display: block; width: 22px; height: 2px; background: var(--ink); }
+  .menu nav {
+    position: absolute; right: 0; top: 52px; width: min(80vw, 280px); background: var(--paper);
+    border: var(--hairline); border-radius: var(--r-2); box-shadow: var(--shadow); padding: var(--s-3);
+  }
+  .menu a { display: block; padding: 10px 12px; color: var(--ink); text-decoration: none; border-radius: var(--r-1); }
+  .menu a:hover { background: var(--paper-2); }
+  @media (min-width: 980px) {
+    .nav, .cta { display: flex; }
+    .menu { display: none; }
+  }
+</style>

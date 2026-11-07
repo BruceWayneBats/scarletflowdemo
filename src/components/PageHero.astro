@@ -1,0 +1,19 @@
+---
+import Sakura from "./Sakura.astro";
+interface Props { eyebrow: string; title: string; lead: string }
+const { eyebrow, title, lead } = Astro.props;
+---
+<section class="page-hero">
+  <Sakura class="ph-branch" />
+  <div class="container">
+    <p class="eyebrow">{eyebrow}</p>
+    <h1>{title}</h1>
+    <p class="lead">{lead}</p>
+    <slot />
+  </div>
+</section>
+<style>
+  .page-hero { position: relative; overflow: hidden; padding: clamp(40px, 7vw, 88px) 0 clamp(32px, 5vw, 56px); border-bottom: var(--hairline); }
+  .page-hero h1 { max-width: 20ch; }
+  :global(.ph-branch) { position: absolute; right: -20px; top: 0; width: 200px; opacity: .6; }
+</style>

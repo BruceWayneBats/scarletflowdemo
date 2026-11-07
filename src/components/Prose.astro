@@ -1,0 +1,12 @@
+---
+/** Long text pages: comfortable measure, styled lists and headings. */
+---
+<div class="prose container"><slot /></div>
+<style>
+  .prose { max-width: 760px; padding-block: var(--s-7) var(--s-8); }
+  .prose :global(h2) { font-size: 2rem; margin-top: var(--s-7); }
+  .prose :global(h3) { font-size: 1.5rem; margin-top: var(--s-6); }
+  .prose :global(p), .prose :global(li) { color: var(--ink); }
+  .prose :global(.callout) { background: var(--sakura); border-radius: var(--r-2); padding: var(--s-4) var(--s-5); margin: var(--s-5) 0; }
+  .prose :global(.warning) { background: #fff3c4; border: 1px solid #e6cf73; border-radius: var(--r-2); padding: var(--s-4) var(--s-5); font-weight: 600; }
+</style>

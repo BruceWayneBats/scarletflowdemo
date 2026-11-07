@@ -1,0 +1,11 @@
+---
+import Base from "../layouts/Base.astro";
+import { url } from "../config";
+---
+<Base title="Страница не найдена" path="/404/" description="Такой страницы нет." noindex>
+  <section class="section"><div class="container">
+    <h1>Такой страницы нет</h1>
+    <p class="lead">Возможно, ссылка устарела.</p>
+    <a class="btn btn--primary" href={url("/")}>На главную</a>
+  </div></section>
+</Base>
