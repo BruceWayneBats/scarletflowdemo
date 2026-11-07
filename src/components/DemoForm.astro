@@ -32,11 +32,23 @@ const sample = "Консультация стоматолога — 1500\nПро
   <p class="note">Демо живёт 3 дня, затем удаляется вместе со всеми данными. Не вводите настоящие данные пациентов.</p>
   <div class="status" data-status tabindex="-1" role="status"></div>
 </form>
+<section class="result card" data-result hidden aria-labelledby="demo-ready">
+  <h2 id="demo-ready" class="h-sm">Демо-бот готов</h2>
+  <p class="muted" data-result-text></p>
+  <iframe title="Демо-чат" data-chat loading="lazy"></iframe>
+  <div class="actions" data-links></div>
+</section>
 <script>
+  import { errorText, prepare, send } from "../lib/api";
   import { DEMO_MODE_TEXT, maxLen, required, status, validate } from "../lib/forms";
   const form = document.querySelector<HTMLFormElement>("[data-demo]");
   const area = form?.querySelector<HTMLTextAreaElement>("#d-services");
-  const LINE = /^(.{2,80}?)\s*[—–\-:;]\s*(\d[\d\s]{0,8})(?:\s*₽|\s*руб\.?)?(?:\s*;\s*\d{2,3})?\s*$/;
+  const result = document.querySelector<HTMLElement>("[data-result]");
+  const api = form?.dataset.api ?? "";
+  const LINE = /^(.{2,80}?)\s*[—–\-:;,]\s*(\d[\d\s]{0,8})(?:\s*₽|\s*руб\.?|\s*р\.?)?(?:\s*[;,]\s*\d{2,3}(?:\s*мин\.?)?)?\s*$/i;
+  const HEADER = /^(название|услуга|name)\s*[;,]/i;
+  let proof: ReturnType<typeof prepare> | null = null;
+  form?.addEventListener("focusin", () => { if (api && !proof) proof = prepare(api, "demo"); });
 
   form?.querySelector<HTMLInputElement>("#d-file")?.addEventListener("change", async (e) => {
     const file = (e.target as HTMLInputElement).files?.[0];
@@ -46,14 +58,34 @@ const sample = "Консультация стоматолога — 1500\nПро
   });
 
   const services = (v: string) => {
-    const lines = v.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    const lines = v.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).filter((l, i) => !(i === 0 && HEADER.test(l)));
     if (!lines.length) return "Добавьте хотя бы одну услугу";
     if (lines.length > 30) return "Не больше 30 услуг";
     const bad = lines.findIndex((l) => !LINE.test(l));
-    return bad >= 0 ? `Строка ${bad + 1}: нужно «Название — цена»` : null;
+    return bad >= 0 ? `Строка «${lines[bad].slice(0, 40)}»: нужно «Название — цена»` : null;
   };
 
-  form?.addEventListener("submit", (e) => {
+  function showDemo(data: Record<string, unknown>) {
+    if (!result) return;
+    const expires = new Date(String(data.expires_at)).toLocaleString("ru-RU", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+    const rejected = (data.rejected_lines as number[]) ?? [];
+    result.querySelector<HTMLElement>("[data-result-text]")!.textContent =
+      `Напишите боту как пациент. Демо работает до ${expires}, потом удаляется.` +
+      (rejected.length ? ` Строки ${rejected.join(", ")} пропущены: формат или содержание.` : "");
+    result.querySelector<HTMLIFrameElement>("[data-chat]")!.src = String(data.chat_url);
+    const links = result.querySelector<HTMLElement>("[data-links]")!;
+    links.textContent = "";
+    if (data.telegram_url) {
+      const a = document.createElement("a");
+      a.className = "btn btn--ghost"; a.href = String(data.telegram_url); a.target = "_blank"; a.rel = "noopener";
+      a.textContent = "Открыть в Telegram";
+      links.append(a);
+    }
+    result.hidden = false;
+    result.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }
+
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const ok = validate(form, {
       clinic_name: [required("Напишите название клиники"), maxLen(60, "Не больше 60 символов")],
@@ -61,12 +93,31 @@ const sample = "Консультация стоматолога — 1500\nПро
       consent: [required("Нужно согласие")],
     });
     if (!ok) return;
-    if (!form.dataset.api) { status(form, DEMO_MODE_TEXT); return; }
-    status(form, "Создаём демо…"); // part B: POST to the backend, then the chat
+    if (!api) { status(form, DEMO_MODE_TEXT); return; }
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    button.disabled = true;
+    status(form, "Создаём демо… Это займёт несколько секунд.");
+    const v = (name: string) => (form.elements.namedItem(name) as HTMLInputElement).value;
+    try {
+      const res = await send(api, "demo", {
+        clinic_name: v("clinic_name"), services: v("services"), website: v("website"),
+        consent: true, consent_version: form.dataset.consent,
+      }, await (proof ?? prepare(api, "demo")));
+      if (res.ok) { status(form, "Готово!"); showDemo(res); }
+      else status(form, errorText(res.error));
+    } catch {
+      status(form, errorText("network"));
+    } finally {
+      proof = null;
+      button.disabled = false;
+    }
   });
 </script>
 <style>
   .form { background: var(--paper); padding: clamp(20px, 4vw, 36px); box-shadow: var(--shadow); }
   .file { padding: 10px; }
+  .result { margin-top: var(--s-6); background: var(--paper); }
+  .result iframe { width: 100%; height: min(620px, 80vh); border: var(--hairline); border-radius: var(--r-2); background: var(--paper); margin: var(--s-4) 0; }
+  .h-sm { font-size: 1.6rem; }
   .note { margin: var(--s-3) 0 0; }
 </style>
