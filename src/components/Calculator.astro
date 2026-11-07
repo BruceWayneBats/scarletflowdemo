@@ -3,10 +3,10 @@
 import { url } from "../config";
 const fields = [
   { id: "leads", label: "Обращений в месяц", hint: "Звонки и сообщения вместе", value: 300, min: 0, max: 100000, step: 1, suffix: "" },
-  { id: "lost", label: "Доля потерянных, %", hint: "Без ответа, с поздним ответом, без продолжения", value: 15, min: 0, max: 100, step: 1, suffix: "%" },
-  { id: "conv", label: "Конверсия в визит, %", hint: "Сколько обработанных обращений доходит до приёма", value: 35, min: 0, max: 100, step: 1, suffix: "%" },
+  { id: "lost", label: "Теряется, %", hint: "Без ответа, поздний ответ, без продолжения", value: 15, min: 0, max: 100, step: 1, suffix: "%" },
+  { id: "conv", label: "Конверсия, %", hint: "Доля обращений, дошедших до приёма", value: 35, min: 0, max: 100, step: 1, suffix: "%" },
   { id: "check", label: "Средний чек, ₽", hint: "", value: 9000, min: 0, max: 10000000, step: 100, suffix: "₽" },
-  { id: "budget", label: "Рекламный бюджет в месяц, ₽", hint: "Необязательно", value: 150000, min: 0, max: 100000000, step: 1000, suffix: "₽" },
+  { id: "budget", label: "Реклама, ₽/мес", hint: "Необязательно", value: 150000, min: 0, max: 100000000, step: 1000, suffix: "₽" },
 ];
 ---
 <form class="calc card" data-calc aria-describedby="calc-note" onsubmit="return false">
@@ -64,5 +64,5 @@ const fields = [
   dl { margin: 0 0 var(--s-4); display: grid; gap: var(--s-2); }
   dl div { display: flex; justify-content: space-between; gap: var(--s-4); border-bottom: var(--hairline); padding-bottom: var(--s-2); }
   dt { color: var(--ink-2); }
-  dd { margin: 0; font-weight: 600; }
+  dd { margin: 0; font-weight: 600; white-space: nowrap; }
 </style>
