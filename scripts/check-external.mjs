@@ -4,7 +4,9 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const DIST = "dist";
-const OWN = ["https://brucewaynebats.github.io/scarletflowdemo"];
+// Our own hosts: the site and our backend (config.apiBase: the chat loader comes from there).
+const apiBase = readFileSync("src/config.ts", "utf8").match(/\?\? "(https:\/\/[^"]+)"/)?.[1];
+const OWN = ["https://brucewaynebats.github.io/scarletflowdemo", ...(apiBase ? [apiBase] : [])];
 const LINKS_OK = [/^https:\/\/t\.me\//, /^https:\/\/max\.ru\//, /^https:\/\/schema\.org/];
 const files = (dir) => readdirSync(dir).flatMap((f) => {
   const p = join(dir, f);
