@@ -3,7 +3,7 @@ export const config = {
   name: "ScarletFlow",
   /** Our backend (main project): forms and the demo. Until a server with a domain exists it is
    * a temporary tunnel, so this changes with it. Empty: forms work in "demo mode" (no sending). */
-  apiBase: (import.meta.env.PUBLIC_API_BASE as string | undefined) ?? "https://cups-admitted-influence-institute.trycloudflare.com",
+  apiBase: (import.meta.env.PUBLIC_API_BASE as string | undefined) ?? "https://subsequently-commons-brochures-biz.trycloudflare.com",
   /** Show the demo form (part B connects it to the backend). */
   demoEnabled: true,
   /** The cases page stays hidden until there are real, agreed results. */
