@@ -92,6 +92,9 @@ export interface ActiveNiche extends Base {
   };
   /** Required when `demo` is true. */
   demoForm?: {
+    /** The ready example anyone may chat with, without signing in. */
+    exampleTitle: string;
+    exampleLead: string;
     lead: string;
     nameLabel: string;
     namePlaceholder: string;

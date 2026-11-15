@@ -14,7 +14,7 @@ export const config = {
   /** The cases page stays hidden until there are real, agreed results. */
   casesEnabled: false,
   /** Version of the consent text the forms refer to (/consent/). */
-  consentVersion: "2026-11-v2",
+  consentVersion: "2026-11-v3",
 };
 
 /** A path inside the site, with the base (/scarletflowdemo/ on GitHub Pages). */

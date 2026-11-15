@@ -1,66 +1,246 @@
 ---
+/**
+ * The demo page's working part (step 9.3): the ready example without signing in; sign-in by
+ * an SMS code; then the account's own demo, the form for a new one, or when the next one is
+ * possible; logout and account deletion. Texts: the niche file and src/content/product.ts.
+ */
 import { config, url } from "../config";
+import { account } from "../content/product";
 import type { ActiveNiche } from "../niches/types";
 interface Props { niche: ActiveNiche }
 const { niche } = Astro.props;
 const d = niche.demoForm!;
 ---
-<form class="form card" data-demo novalidate data-api={config.apiBase} data-consent={config.consentVersion}
-  data-name-error={d.nameError} data-result={d.result}>
-  <div class="field">
-    <label for="d-name">{d.nameLabel}</label>
-    <input class="input" id="d-name" name="clinic_name" maxlength="60" placeholder={d.namePlaceholder} aria-describedby="d-name-e" />
-    <span class="error" id="d-name-e" data-error-for="clinic_name"></span>
-  </div>
-  <div class="field">
-    <label for="d-services">Услуги и цены</label>
-    <span class="hint" id="d-services-h">По одной на строку: «Название — цена». До 30 строк. Можно загрузить CSV: название;цена;длительность в минутах.</span>
-    <textarea class="input" id="d-services" name="services" maxlength="4000" placeholder={d.sample} aria-describedby="d-services-h d-services-e"></textarea>
-    <span class="error" id="d-services-e" data-error-for="services"></span>
-  </div>
-  <div class="field">
-    <label for="d-file">Или файл CSV <span class="muted">(до 20 КБ)</span></label>
-    <input class="input file" id="d-file" type="file" accept=".csv,text/csv,text/plain" />
-  </div>
-  <div class="trap" aria-hidden="true">
-    <label for="d-site">Сайт</label><input id="d-site" name="website" tabindex="-1" autocomplete="off" />
-  </div>
-  <div class="field">
-    <label class="check" for="d-consent">
-      <input type="checkbox" id="d-consent" name="consent" aria-describedby="d-consent-e" />
-      <span>Согласен на <a href={url("/consent/")} target="_blank" rel="noopener">обработку данных</a>, введённых в демо</span>
-    </label>
-    <span class="error" id="d-consent-e" data-error-for="consent"></span>
-  </div>
-  <button class="btn btn--primary" type="submit">Создать демо-бота</button>
-  <p class="note">{d.note}</p>
-  <div class="status" data-status tabindex="-1" role="status"></div>
-</form>
-<section class="result card" data-result hidden aria-labelledby="demo-ready">
-  <h2 id="demo-ready" class="h-sm">Демо-бот готов</h2>
-  <p class="muted" data-result-text></p>
-  <iframe title="Демо-чат" data-chat loading="lazy"></iframe>
-  <div class="actions" data-links></div>
-</section>
+<div class="demo-flow" data-flow data-api={config.apiBase} data-consent={config.consentVersion}
+  data-name-error={d.nameError} data-result={d.result} data-wait={account.waitText}
+  data-disabled={account.disabledText} data-deleted={account.deleted}>
+
+  <section class="card example" aria-labelledby="ex-h">
+    <h2 id="ex-h" class="h-sm">{d.exampleTitle}</h2>
+    <p class="muted">{d.exampleLead}</p>
+    <button class="btn btn--ghost" type="button" data-example-open>{account.openExample}</button>
+    <iframe title="Пример чата" data-example-chat hidden></iframe>
+    <p class="note" data-example-status role="status"></p>
+  </section>
+
+  <section class="card login" data-login aria-labelledby="login-h">
+    <h2 id="login-h" class="h-sm">{account.loginTitle}</h2>
+    <p class="muted">{account.loginLead}</p>
+    <form class="form" data-phone novalidate>
+      <div class="field">
+        <label for="l-phone">{account.phoneLabel}</label>
+        <input class="input" id="l-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel"
+          maxlength="20" placeholder="+7 9…" aria-describedby="l-phone-e" />
+        <span class="error" id="l-phone-e" data-error-for="phone"></span>
+      </div>
+      <div class="trap" aria-hidden="true">
+        <label for="l-site">Сайт</label><input id="l-site" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label class="check" for="l-consent">
+          <input type="checkbox" id="l-consent" name="consent" aria-describedby="l-consent-e" />
+          <span>{account.consent} — <a href={url("/consent/")} target="_blank" rel="noopener">согласие</a>,
+            <a href={url("/privacy/")} target="_blank" rel="noopener">политика</a>.</span>
+        </label>
+        <span class="error" id="l-consent-e" data-error-for="consent"></span>
+        <span class="note"><span class="todo">{account.consentTodo}</span></span>
+      </div>
+      <button class="btn btn--primary" type="submit">{account.getCode}</button>
+      <div class="status" data-status tabindex="-1" role="status"></div>
+    </form>
+    <form class="form" data-code novalidate hidden>
+      <div class="field">
+        <label for="l-code">{account.codeLabel}</label>
+        <input class="input" id="l-code" name="code" inputmode="numeric" autocomplete="one-time-code"
+          maxlength="6" aria-describedby="l-code-e" />
+        <span class="error" id="l-code-e" data-error-for="code"></span>
+      </div>
+      <div class="actions">
+        <button class="btn btn--primary" type="submit">{account.signIn}</button>
+        <button class="btn btn--ghost" type="button" data-change-phone>{account.changePhone}</button>
+      </div>
+      <div class="status" data-status tabindex="-1" role="status"></div>
+    </form>
+  </section>
+
+  <section class="account" data-account hidden>
+    <p class="who">{account.signedIn} <strong data-who></strong>
+      <button class="link" type="button" data-logout>{account.logout}</button></p>
+
+    <section class="card result" data-live hidden aria-labelledby="live-h">
+      <h2 id="live-h" class="h-sm">{account.liveTitle} <span data-live-name></span></h2>
+      <p class="muted" data-live-text></p>
+      <iframe title="Демо-чат" data-chat loading="lazy"></iframe>
+      <div class="actions" data-links></div>
+    </section>
+
+    <p class="card wait" data-wait-box hidden role="status"></p>
+
+    <form class="form card" data-demo novalidate hidden>
+      <div class="field">
+        <label for="d-name">{d.nameLabel}</label>
+        <input class="input" id="d-name" name="clinic_name" maxlength="60" placeholder={d.namePlaceholder} aria-describedby="d-name-e" />
+        <span class="error" id="d-name-e" data-error-for="clinic_name"></span>
+      </div>
+      <div class="field">
+        <label for="d-services">Услуги и цены</label>
+        <span class="hint" id="d-services-h">По одной на строку: «Название — цена». До 30 строк. Можно загрузить CSV: название;цена;длительность в минутах.</span>
+        <textarea class="input" id="d-services" name="services" maxlength="4000" placeholder={d.sample} aria-describedby="d-services-h d-services-e"></textarea>
+        <span class="error" id="d-services-e" data-error-for="services"></span>
+      </div>
+      <div class="field">
+        <label for="d-file">Или файл CSV <span class="muted">(до 20 КБ)</span></label>
+        <input class="input file" id="d-file" type="file" accept=".csv,text/csv,text/plain" />
+      </div>
+      <div class="trap" aria-hidden="true">
+        <label for="d-site">Сайт</label><input id="d-site" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label class="check" for="d-consent">
+          <input type="checkbox" id="d-consent" name="consent" aria-describedby="d-consent-e" />
+          <span>Согласен на <a href={url("/consent/")} target="_blank" rel="noopener">обработку данных</a>, введённых в демо</span>
+        </label>
+        <span class="error" id="d-consent-e" data-error-for="consent"></span>
+      </div>
+      <button class="btn btn--primary" type="submit">Создать демо-бота</button>
+      <p class="note">{d.note}</p>
+      <div class="status" data-status tabindex="-1" role="status"></div>
+    </form>
+
+    <details class="danger">
+      <summary>{account.deleteTitle}</summary>
+      <p class="muted">{account.deleteText}</p>
+      <button class="btn btn--ghost" type="button" data-delete>{account.deleteButton}</button>
+    </details>
+  </section>
+  <p class="note" data-flow-status role="status"></p>
+</div>
+
 <script>
   import { errorText, prepare, send } from "../lib/api";
-  import { DEMO_MODE_TEXT, maxLen, required, status, validate } from "../lib/forms";
-  const form = document.querySelector<HTMLFormElement>("[data-demo]");
-  const area = form?.querySelector<HTMLTextAreaElement>("#d-services");
-  const result = document.querySelector<HTMLElement>("[data-result]");
-  const api = form?.dataset.api ?? "";
+  import { auth, call, deviceId, getToken, setToken, when } from "../lib/account";
+  import { DEMO_MODE_TEXT, maxLen, required, setError, status, validate } from "../lib/forms";
+
+  const root = document.querySelector<HTMLElement>("[data-flow]")!;
+  const api = root.dataset.api ?? "";
+  const $ = <T extends HTMLElement = HTMLElement>(s: string) => root.querySelector<T>(s)!;
+  const phoneForm = $<HTMLFormElement>("[data-phone]");
+  const codeForm = $<HTMLFormElement>("[data-code]");
+  const demoForm = $<HTMLFormElement>("[data-demo]");
+  const area = demoForm.querySelector<HTMLTextAreaElement>("#d-services")!;
   const LINE = /^(.{2,80}?)\s*[—–\-:;,]\s*(\d[\d\s]{0,8})(?:\s*₽|\s*руб\.?|\s*р\.?)?(?:\s*[;,]\s*\d{2,3}(?:\s*мин\.?)?)?\s*$/i;
   const HEADER = /^(название|услуга|name)\s*[;,]/i;
+  const MOBILE = /^(\+7|8|7)?9\d{9}$/;
+  let phone = "";
   let proof: ReturnType<typeof prepare> | null = null;
-  form?.addEventListener("focusin", () => { if (api && !proof) proof = prepare(api, "demo"); });
+  let demoProof: ReturnType<typeof prepare> | null = null;
+  const say = (text: string) => { $("[data-flow-status]").textContent = text; };
 
-  form?.querySelector<HTMLInputElement>("#d-file")?.addEventListener("change", async (e) => {
-    const file = (e.target as HTMLInputElement).files?.[0];
-    if (!file || !area) return;
-    if (file.size > 20_000) { status(form!, "Файл больше 20 КБ"); return; }
-    area.value = (await file.text()).slice(0, 4000);
+  // The ready example: no account.
+  $("[data-example-open]").addEventListener("click", async () => {
+    if (!api) { $("[data-example-status]").textContent = DEMO_MODE_TEXT; return; }
+    const res = await call(api, "example");
+    if (!res.ok) { $("[data-example-status]").textContent = errorText(String(res.error)); return; }
+    const frame = $<HTMLIFrameElement>("[data-example-chat]");
+    frame.src = String(res.chat_url);
+    frame.hidden = false;
+    $("[data-example-open]").hidden = true;
   });
 
+  function show(signedIn: boolean) {
+    $("[data-login]").hidden = signedIn;
+    $("[data-account]").hidden = !signedIn;
+  }
+
+  async function refresh() {
+    if (!api || !getToken()) { show(false); return; }
+    const res = await call(api, "account");
+    if (!res.ok) { show(false); if (res.error !== "login_required") say(errorText(String(res.error))); return; }
+    show(true);
+    $("[data-who]").textContent = String(res.phone);
+    const live = res.demo as Record<string, string | null> | null;
+    const wait = $("[data-wait-box]");
+    $("[data-live]").hidden = !live;
+    demoForm.hidden = true;
+    wait.hidden = true;
+    const next = res.next_at ? `${root.dataset.wait} ${when(String(res.next_at))}.` : "";
+    if (live) {
+      $("[data-live-name]").textContent = `«${live.name}»`;
+      $("[data-live-text]").textContent =
+        `${root.dataset.result} Демо работает до ${when(String(live.expires_at))}, потом удаляется. ${next}`;
+      $<HTMLIFrameElement>("[data-chat]").src = String(live.chat_url);
+      const links = $("[data-links]");
+      links.textContent = "";
+      if (live.telegram_url) {
+        const a = document.createElement("a");
+        a.className = "btn btn--ghost"; a.href = live.telegram_url; a.target = "_blank"; a.rel = "noopener";
+        a.textContent = "Открыть в Telegram";
+        links.append(a);
+      }
+      return;
+    }
+    if (!res.demo_enabled) { wait.textContent = String(root.dataset.disabled); wait.hidden = false; }
+    else if (!res.can_create) { wait.textContent = next; wait.hidden = false; }
+    else demoForm.hidden = false;
+  }
+
+  phoneForm.addEventListener("focusin", () => { if (api && !proof) proof = prepare(api, "account"); });
+  phoneForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const ok = validate(phoneForm, {
+      phone: [(v) => (MOBILE.test(v.replace(/[\s()-]/g, "")) ? null : errorText("bad_phone"))],
+      consent: [required(errorText("no_consent"))],
+    });
+    if (!ok) return;
+    if (!api) { status(phoneForm, DEMO_MODE_TEXT); return; }
+    phone = (phoneForm.elements.namedItem("phone") as HTMLInputElement).value;
+    status(phoneForm, "Отправляем код…");
+    const res = await send(api, "account", {
+      phone, consent: true, consent_version: root.dataset.consent,
+      website: (phoneForm.elements.namedItem("website") as HTMLInputElement).value,
+    }, await (proof ?? prepare(api, "account")), "account/code");
+    proof = null;
+    if (!res.ok) { status(phoneForm, errorText(res.error)); return; }
+    status(phoneForm, "");
+    phoneForm.hidden = true;
+    codeForm.hidden = false;
+    codeForm.querySelector<HTMLInputElement>("#l-code")!.focus();
+  });
+
+  codeForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const code = (codeForm.elements.namedItem("code") as HTMLInputElement).value.trim();
+    if (!/^\d{6}$/.test(code)) { setError(codeForm, "code", "6 цифр из SMS"); return; }
+    setError(codeForm, "code", null);
+    const res = await call(api, "account/verify", "POST", { phone, code });
+    if (!res.ok) { status(codeForm, errorText(String(res.error))); return; }
+    if (typeof res.token === "string") setToken(res.token, String(res.expires_at));
+    codeForm.reset();
+    codeForm.hidden = true;
+    phoneForm.hidden = false;
+    await refresh();
+  });
+  $("[data-change-phone]").addEventListener("click", () => { codeForm.hidden = true; phoneForm.hidden = false; });
+
+  $("[data-logout]").addEventListener("click", async () => {
+    await call(api, "account/logout", "POST", {});
+    setToken(null);
+    show(false);
+  });
+  $("[data-delete]").addEventListener("click", async () => {
+    const res = await call(api, "account", "DELETE");
+    if (!res.ok) { say(errorText(String(res.error))); return; }
+    setToken(null);
+    show(false);
+    say(String(root.dataset.deleted));
+  });
+
+  demoForm.querySelector<HTMLInputElement>("#d-file")?.addEventListener("change", async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    if (file.size > 20_000) { status(demoForm, "Файл больше 20 КБ"); return; }
+    area.value = (await file.text()).slice(0, 4000);
+  });
   const services = (v: string) => {
     const lines = v.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).filter((l, i) => !(i === 0 && HEADER.test(l)));
     if (!lines.length) return "Добавьте хотя бы одну услугу";
@@ -68,60 +248,60 @@ const d = niche.demoForm!;
     const bad = lines.findIndex((l) => !LINE.test(l));
     return bad >= 0 ? `Строка «${lines[bad].slice(0, 40)}»: нужно «Название — цена»` : null;
   };
-
-  function showDemo(data: Record<string, unknown>) {
-    if (!result) return;
-    const expires = new Date(String(data.expires_at)).toLocaleString("ru-RU", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
-    const rejected = (data.rejected_lines as number[]) ?? [];
-    result.querySelector<HTMLElement>("[data-result-text]")!.textContent =
-      `${form?.dataset.result ?? ""} Демо работает до ${expires}, потом удаляется.` +
-      (rejected.length ? ` Строки ${rejected.join(", ")} пропущены: формат или содержание.` : "");
-    result.querySelector<HTMLIFrameElement>("[data-chat]")!.src = String(data.chat_url);
-    const links = result.querySelector<HTMLElement>("[data-links]")!;
-    links.textContent = "";
-    if (data.telegram_url) {
-      const a = document.createElement("a");
-      a.className = "btn btn--ghost"; a.href = String(data.telegram_url); a.target = "_blank"; a.rel = "noopener";
-      a.textContent = "Открыть в Telegram";
-      links.append(a);
-    }
-    result.hidden = false;
-    result.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-  }
-
-  form?.addEventListener("submit", async (e) => {
+  demoForm.addEventListener("focusin", () => { if (api && !demoProof) demoProof = prepare(api, "demo"); });
+  demoForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const ok = validate(form, {
-      clinic_name: [required(form.dataset.nameError ?? ""), maxLen(60, "Не больше 60 символов")],
+    const ok = validate(demoForm, {
+      clinic_name: [required(root.dataset.nameError ?? ""), maxLen(60, "Не больше 60 символов")],
       services: [services],
       consent: [required("Нужно согласие")],
     });
     if (!ok) return;
-    if (!api) { status(form, DEMO_MODE_TEXT); return; }
-    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const button = demoForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
     button.disabled = true;
-    status(form, "Создаём демо… Это займёт несколько секунд.");
-    const v = (name: string) => (form.elements.namedItem(name) as HTMLInputElement).value;
+    status(demoForm, "Создаём демо… Это займёт несколько секунд.");
+    const v = (name: string) => (demoForm.elements.namedItem(name) as HTMLInputElement).value;
     try {
       const res = await send(api, "demo", {
         clinic_name: v("clinic_name"), services: v("services"), website: v("website"),
-        consent: true, consent_version: form.dataset.consent,
-      }, await (proof ?? prepare(api, "demo")));
-      if (res.ok) { status(form, "Готово!"); showDemo(res); }
-      else status(form, errorText(res.error));
+        consent: true, consent_version: root.dataset.consent, device: deviceId(),
+      }, await (demoProof ?? prepare(api, "demo")), "demo", auth());
+      if (res.ok) {
+        status(demoForm, "Готово!");
+        const rejected = (res.rejected_lines as number[]) ?? [];
+        if (rejected.length) say(`Строки ${rejected.join(", ")} пропущены: формат или содержание.`);
+        await refresh();
+        $("[data-live]").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      } else {
+        status(demoForm, errorText(res.error));
+        if (res.error === "quota" || res.error === "login_required") await refresh();
+      }
     } catch {
-      status(form, errorText("network"));
+      status(demoForm, errorText("network"));
     } finally {
-      proof = null;
+      demoProof = null;
       button.disabled = false;
     }
   });
+
+  refresh();
 </script>
 <style>
-  .form { background: var(--paper); padding: clamp(20px, 4vw, 36px); box-shadow: var(--shadow); }
+  .demo-flow { display: grid; gap: var(--s-6); }
+  .card, .form { background: var(--paper); }
   .file { padding: 10px; }
-  .result { margin-top: var(--s-6); background: var(--paper); }
-  .result iframe { width: 100%; height: min(620px, 80vh); border: var(--hairline); border-radius: var(--r-2); background: var(--paper); margin: var(--s-4) 0; }
+  .example iframe, .result iframe {
+    width: 100%; height: min(620px, 80vh); border: var(--hairline); border-radius: var(--r-2);
+    background: var(--paper); margin: var(--s-4) 0;
+  }
+  .example [hidden] { display: none; }
   .h-sm { font-size: 1.6rem; }
   .note { margin: var(--s-3) 0 0; }
+  .who { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: baseline; margin: 0; }
+  .link { background: none; border: 0; padding: 0; color: var(--vermilion-ink); text-decoration: underline; cursor: pointer; font: inherit; }
+  .wait { font-weight: 600; }
+  .account { display: grid; gap: var(--s-5); }
+  .account[hidden], .login[hidden], form[hidden], .result[hidden], .wait[hidden] { display: none; }
+  .danger { border-top: var(--hairline); padding-top: var(--s-4); }
+  .danger summary { cursor: pointer; color: var(--ink-2); }
 </style>
