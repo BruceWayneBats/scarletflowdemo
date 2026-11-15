@@ -4,6 +4,8 @@
  * The frames fade in on scroll (CSS + IntersectionObserver); without JS or with reduced
  * motion they are simply shown.
  */
+interface Props { captions: [string, string, string] }
+const { captions } = Astro.props;
 ---
 <ol class="story" aria-label="Как помощник подхватывает ночное обращение">
   <li class="frame">
@@ -23,7 +25,7 @@
         </g>
         <text x="200" y="104" fill="#a82820" font-family="Manrope, sans-serif" font-size="13" font-weight="600">23:40</text>
       </svg>
-      <figcaption><span>1</span>Ночь. Пациент звонит, а в клинике уже никого нет.</figcaption>
+      <figcaption><span>1</span>{captions[0]}</figcaption>
     </figure>
   </li>
   <li class="frame">
@@ -48,7 +50,7 @@
         <text x="206" y="88" fill="#1f1a17" font-family="Manrope, sans-serif" font-size="13" font-weight="600">Я на связи</text>
         <path d="M24 202h252" stroke="#c8322a" stroke-width="1.2" />
       </svg>
-      <figcaption><span>2</span>Помощник отвечает за минуту и бережно ведёт разговор дальше.</figcaption>
+      <figcaption><span>2</span>{captions[1]}</figcaption>
     </figure>
   </li>
   <li class="frame">
@@ -73,7 +75,7 @@
         </g>
         <g fill="#c8322a"><circle cx="127" cy="131" r="1.8" /><circle cx="135" cy="131" r="1.8" /></g>
       </svg>
-      <figcaption><span>3</span>Утром — записи в расписании и понятный отчёт о том, что было ночью.</figcaption>
+      <figcaption><span>3</span>{captions[2]}</figcaption>
     </figure>
   </li>
 </ol>

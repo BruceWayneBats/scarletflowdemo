@@ -1,0 +1,30 @@
+---
+/** The demo page of a niche with `demo: true`: the form and what to try in the bot. */
+import Base from "../layouts/Base.astro";
+import PageHero from "./PageHero.astro";
+import DemoForm from "./DemoForm.astro";
+import { demoPath } from "../niches";
+import type { ActiveNiche } from "../niches/types";
+interface Props { niche: ActiveNiche }
+const { niche } = Astro.props;
+const d = niche.demoForm!;
+---
+<Base title="Попробовать демо" path={demoPath(niche)!} chat={false} niche={niche} description={d.lead}>
+  <PageHero eyebrow="Демо" title="Ваш бот на ваших услугах за минуту" lead={d.lead} />
+  <section class="section">
+    <div class="container demo">
+      <DemoForm niche={niche} />
+      <aside class="card help">
+        <h2 class="h-sm">Что проверить</h2>
+        <ul>{d.checks.map((c) => <li>{c}</li>)}</ul>
+        <p class="note">{d.checksNote}</p>
+      </aside>
+    </div>
+  </section>
+</Base>
+<style>
+  .demo { display: grid; gap: var(--s-6); align-items: start; }
+  @media (min-width: 960px) { .demo { grid-template-columns: 1.4fr 1fr; } }
+  .help { background: var(--sakura); border: none; }
+  .h-sm { font-size: 1.6rem; }
+</style>

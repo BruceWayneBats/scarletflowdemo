@@ -1,0 +1,41 @@
+---
+/**
+ * One address segment: a page of the default niche (/missed-calls/), its demo (/demo/, only
+ * if the niche has one) or the home of another active niche (/realty/). All of it comes from
+ * the niche files; nothing here is niche-specific.
+ */
+import type { GetStaticPaths } from "astro";
+import DemoView from "../components/DemoView.astro";
+import NicheHome from "../components/NicheHome.astro";
+import TextPage from "../components/TextPage.astro";
+import { active, defaultNiche, isDefault, pagePath } from "../niches";
+import type { ActiveNiche, NichePage } from "../niches/types";
+
+type Kind = "page" | "home" | "demo";
+
+export const getStaticPaths = (() => {
+  // Static pages of the site: no niche or niche page may take these addresses. Inside the
+  // function: Astro runs getStaticPaths apart from the rest of the frontmatter.
+  const RESERVED = new Set(["security", "privacy", "consent", "404", "robots.txt"]);
+  if (defaultNiche.pages.some((p) => p.slug === "demo")) throw new Error('niches: a page may not be named "demo"');
+  const paths = [
+    ...defaultNiche.pages.map((page) => ({ params: { slug: page.slug }, props: { niche: defaultNiche, page, kind: "page" as Kind } })),
+    ...(defaultNiche.demo ? [{ params: { slug: "demo" }, props: { niche: defaultNiche, page: null, kind: "demo" as Kind } }] : []),
+    ...active.filter((n) => !isDefault(n)).map((niche) => ({ params: { slug: niche.slug }, props: { niche, page: null, kind: "home" as Kind } })),
+  ];
+  const seen = new Set<string>();
+  for (const p of paths) {
+    if (RESERVED.has(p.params.slug) || seen.has(p.params.slug)) {
+      throw new Error(`niches: address "/${p.params.slug}/" is taken twice`);
+    }
+    seen.add(p.params.slug);
+  }
+  return paths;
+}) satisfies GetStaticPaths;
+
+interface Props { niche: ActiveNiche; page: NichePage | null; kind: Kind }
+const { niche, page, kind } = Astro.props;
+---
+{kind === "page" && page && <TextPage niche={niche} path={pagePath(niche, page)} page={page} />}
+{kind === "demo" && <DemoView niche={niche} />}
+{kind === "home" && <NicheHome niche={niche} />}

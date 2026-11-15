@@ -1,0 +1,46 @@
+---
+/** "Для кого": active niches are links, "soon" ones are plain cards. Hidden ones are left out. */
+import { sections } from "../content/product";
+import { listed, nichePath } from "../niches";
+import type { ActiveNiche } from "../niches/types";
+import { url } from "../config";
+interface Props { current: ActiveNiche }
+const { current } = Astro.props;
+const many = listed.filter((n) => n.status === "active").length > 1;
+---
+<section class="section chooser-wrap" aria-labelledby="chooser-h">
+  <div class="container">
+    <h2 id="chooser-h" class="h-sm">{sections.chooserTitle}</h2>
+    {!many && <p class="muted">{sections.chooserLead}</p>}
+    <ul class="chooser">
+      {listed.map((n) => n.status === "active" ? (
+        <li>
+          <a class:list={["card", "niche", { current: n.slug === current.slug }]} href={url(nichePath(n, "/"))}
+            aria-current={n.slug === current.slug ? "page" : undefined}>
+            <span class="name">{n.name}</span>
+            <span class="muted">{n.teaser}</span>
+          </a>
+        </li>
+      ) : (
+        <li>
+          <div class="card niche soon" aria-disabled="true">
+            <span class="name">{n.name} <span class="badge">скоро</span></span>
+            <span class="muted">{n.teaser}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+<style>
+  .chooser-wrap { padding-block: var(--s-6); border-bottom: var(--hairline); }
+  .h-sm { font-size: 1.6rem; margin-bottom: var(--s-2); }
+  .chooser { list-style: none; padding: 0; margin: var(--s-4) 0 0; display: grid; gap: var(--s-4); }
+  .chooser li + li { margin-top: 0; }
+  @media (min-width: 720px) { .chooser { grid-template-columns: repeat(3, 1fr); } }
+  .niche { display: flex; flex-direction: column; gap: var(--s-2); height: 100%; text-decoration: none; color: var(--ink); background: var(--paper); }
+  a.niche:hover { border-color: var(--vermilion); }
+  .niche.current { border-color: var(--vermilion); box-shadow: inset 0 0 0 1px var(--vermilion); }
+  .niche.soon { background: var(--paper-2); opacity: .85; }
+  .name { font-weight: 600; font-size: 1.1rem; display: flex; gap: var(--s-2); align-items: center; flex-wrap: wrap; }
+</style>

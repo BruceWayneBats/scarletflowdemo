@@ -1,17 +1,21 @@
 ---
 import { config, url } from "../config";
-const sample = "Консультация стоматолога — 1500\nПрофессиональная гигиена — 6500\nЛечение кариеса — 7000\nИмплантация — 45000";
+import type { ActiveNiche } from "../niches/types";
+interface Props { niche: ActiveNiche }
+const { niche } = Astro.props;
+const d = niche.demoForm!;
 ---
-<form class="form card" data-demo novalidate data-api={config.apiBase} data-consent={config.consentVersion}>
+<form class="form card" data-demo novalidate data-api={config.apiBase} data-consent={config.consentVersion}
+  data-name-error={d.nameError} data-result={d.result}>
   <div class="field">
-    <label for="d-name">Название клиники</label>
-    <input class="input" id="d-name" name="clinic_name" maxlength="60" placeholder="Например, «Улыбка»" aria-describedby="d-name-e" />
+    <label for="d-name">{d.nameLabel}</label>
+    <input class="input" id="d-name" name="clinic_name" maxlength="60" placeholder={d.namePlaceholder} aria-describedby="d-name-e" />
     <span class="error" id="d-name-e" data-error-for="clinic_name"></span>
   </div>
   <div class="field">
     <label for="d-services">Услуги и цены</label>
     <span class="hint" id="d-services-h">По одной на строку: «Название — цена». До 30 строк. Можно загрузить CSV: название;цена;длительность в минутах.</span>
-    <textarea class="input" id="d-services" name="services" maxlength="4000" placeholder={sample} aria-describedby="d-services-h d-services-e"></textarea>
+    <textarea class="input" id="d-services" name="services" maxlength="4000" placeholder={d.sample} aria-describedby="d-services-h d-services-e"></textarea>
     <span class="error" id="d-services-e" data-error-for="services"></span>
   </div>
   <div class="field">
@@ -29,7 +33,7 @@ const sample = "Консультация стоматолога — 1500\nПро
     <span class="error" id="d-consent-e" data-error-for="consent"></span>
   </div>
   <button class="btn btn--primary" type="submit">Создать демо-бота</button>
-  <p class="note">Демо живёт 3 дня, затем удаляется вместе со всеми данными. Не вводите настоящие данные пациентов.</p>
+  <p class="note">{d.note}</p>
   <div class="status" data-status tabindex="-1" role="status"></div>
 </form>
 <section class="result card" data-result hidden aria-labelledby="demo-ready">
@@ -70,7 +74,7 @@ const sample = "Консультация стоматолога — 1500\nПро
     const expires = new Date(String(data.expires_at)).toLocaleString("ru-RU", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
     const rejected = (data.rejected_lines as number[]) ?? [];
     result.querySelector<HTMLElement>("[data-result-text]")!.textContent =
-      `Напишите боту как пациент. Демо работает до ${expires}, потом удаляется.` +
+      `${form?.dataset.result ?? ""} Демо работает до ${expires}, потом удаляется.` +
       (rejected.length ? ` Строки ${rejected.join(", ")} пропущены: формат или содержание.` : "");
     result.querySelector<HTMLIFrameElement>("[data-chat]")!.src = String(data.chat_url);
     const links = result.querySelector<HTMLElement>("[data-links]")!;
@@ -88,7 +92,7 @@ const sample = "Консультация стоматолога — 1500\nПро
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const ok = validate(form, {
-      clinic_name: [required("Напишите название клиники"), maxLen(60, "Не больше 60 символов")],
+      clinic_name: [required(form.dataset.nameError ?? ""), maxLen(60, "Не больше 60 символов")],
       services: [services],
       consent: [required("Нужно согласие")],
     });

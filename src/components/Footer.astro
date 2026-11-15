@@ -2,15 +2,25 @@
 import Logo from "./Logo.astro";
 import Sakura from "./Sakura.astro";
 import { legal } from "../content/legal";
-import { pages } from "../content/nav";
+import { labels } from "../content/nav";
+import { demoPath, nichePath, pagePath } from "../niches";
+import type { ActiveNiche } from "../niches/types";
 import { url } from "../config";
+interface Props { niche: ActiveNiche }
+const { niche } = Astro.props;
+const demo = demoPath(niche);
+const pages = [
+  ...niche.pages.map((p) => ({ href: pagePath(niche, p), label: p.label })),
+  { href: nichePath(niche, "/security/"), label: labels.security },
+  ...(demo ? [{ href: demo, label: labels.demo }] : []),
+];
 ---
 <footer class="footer">
   <Sakura class="branch" flip />
   <div class="container cols">
     <div>
       <Logo />
-      <p class="muted about">ИИ-администратор заявок для клиник: отвечает пациентам в мессенджерах, записывает и показывает владельцу, где теряются обращения.</p>
+      <p class="muted about">{niche.footer}</p>
     </div>
     <nav aria-label="Страницы">
       <h2 class="h">Страницы</h2>

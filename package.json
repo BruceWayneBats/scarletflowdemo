@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check && node scripts/check-external.mjs && node scripts/check-weight.mjs && node scripts/check-contrast.mjs",
+    "check": "astro check && node scripts/check-external.mjs && node scripts/check-weight.mjs && node scripts/check-contrast.mjs && node scripts/check-niche-neutral.mjs && node scripts/check-second-niche.mjs",
     "verify": "npm run build && npm run check",
     "check:links": "linkinator http://127.0.0.1:4321/scarletflowdemo/ --recurse --skip 'https://(t\\.me|max\\.ru)'"
   },

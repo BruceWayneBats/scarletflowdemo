@@ -1,13 +1,23 @@
 ---
-/** Loss estimate, the same formula as app/services/loss_calculator.py in the main project. */
+/** Loss estimate, the same formula as app/services/loss_calculator.py in the main project.
+ * The fields and the formula are shared; labels and defaults come from the niche. */
 import { url } from "../config";
+import { hero } from "../content/product";
+import { lossEstimate, rub } from "../lib/text";
+import { nichePath } from "../niches";
+import type { ActiveNiche } from "../niches/types";
+interface Props { niche: ActiveNiche }
+const { niche } = Astro.props;
+const c = niche.calculator;
 const fields = [
-  { id: "leads", label: "Обращений в месяц", hint: "Звонки и сообщения вместе", value: 300, min: 0, max: 100000, step: 1, suffix: "" },
-  { id: "lost", label: "Теряется, %", hint: "Без ответа, поздний ответ, без продолжения", value: 15, min: 0, max: 100, step: 1, suffix: "%" },
-  { id: "conv", label: "Конверсия, %", hint: "Доля обращений, дошедших до приёма", value: 35, min: 0, max: 100, step: 1, suffix: "%" },
-  { id: "check", label: "Средний чек, ₽", hint: "", value: 9000, min: 0, max: 10000000, step: 100, suffix: "₽" },
-  { id: "budget", label: "Реклама, ₽/мес", hint: "Необязательно", value: 150000, min: 0, max: 100000000, step: 1000, suffix: "₽" },
+  { id: "leads", ...c.leads, min: 0, max: 100000, step: 1 },
+  { id: "lost", ...c.lost, min: 0, max: 100, step: 1 },
+  { id: "conv", ...c.conv, min: 0, max: 100, step: 1 },
+  { id: "check", ...c.check, min: 0, max: 10000000, step: 100 },
+  { id: "budget", ...c.budget, min: 0, max: 100000000, step: 1000 },
 ];
+const start = lossEstimate(c.leads.value, c.lost.value, c.conv.value, c.check.value);
+const startBudget = c.budget.value > 0 && c.leads.value > 0 ? rub((c.budget.value / c.leads.value) * start.lost) : "—";
 ---
 <form class="calc card" data-calc aria-describedby="calc-note" onsubmit="return false">
   <div class="inputs">
@@ -22,18 +32,18 @@ const fields = [
   </div>
   <div class="result" aria-live="polite">
     <p class="eyebrow">Оценка потерь в месяц</p>
-    <p class="big" data-out="revenue">≈ 141 750 ₽</p>
+    <p class="big" data-out="revenue">{rub(start.revenue)}</p>
     <dl>
-      <div><dt>Потерянных обращений</dt><dd data-out="leads">45</dd></div>
-      <div><dt>Рекламы ушло на потерянных</dt><dd data-out="budget">≈ 22 500 ₽</dd></div>
+      <div><dt>Потерянных обращений</dt><dd data-out="leads">{start.lost.toLocaleString("ru-RU", { maximumFractionDigits: 1 })}</dd></div>
+      <div><dt>Рекламы ушло на потерянных</dt><dd data-out="budget">{startBudget}</dd></div>
     </dl>
     <p class="note" id="calc-note">Это оценка: потерянные × конверсия × средний чек. Реальные цифры покажет аудит.</p>
-    <a class="btn btn--primary" href={url("/#audit")}>Получить аудит потерь</a>
+    <a class="btn btn--primary" href={url(nichePath(niche, "/#audit"))}>{hero.audit}</a>
   </div>
 </form>
 <script>
+  import { lossEstimate, rub } from "../lib/text";
   const form = document.querySelector<HTMLFormElement>("[data-calc]");
-  const rub = (n: number) => `≈ ${Math.round(n).toLocaleString("ru-RU")} ₽`;
   function num(name: string, max: number): number {
     const el = form!.elements.namedItem(name) as HTMLInputElement;
     const v = Number(el.value);
@@ -45,9 +55,9 @@ const fields = [
     const conv = num("conv", 100) / 100;
     const check = num("check", 10000000);
     const budget = num("budget", 100000000);
-    const lostLeads = leads * lost;
+    const { lost: lostLeads, revenue } = lossEstimate(leads, lost * 100, conv * 100, check);
     const out = (k: string) => form!.querySelector<HTMLElement>(`[data-out="${k}"]`)!;
-    out("revenue").textContent = rub(lostLeads * conv * check);
+    out("revenue").textContent = rub(revenue);
     out("leads").textContent = lostLeads.toLocaleString("ru-RU", { maximumFractionDigits: 1 });
     out("budget").textContent = budget > 0 && leads > 0 ? rub((budget / leads) * lostLeads) : "—";
   }

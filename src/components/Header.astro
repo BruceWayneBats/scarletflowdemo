@@ -1,21 +1,30 @@
 ---
 import Logo from "./Logo.astro";
-import { anchors } from "../content/nav";
+import { anchors, labels } from "../content/nav";
+import { demoPath, nichePath } from "../niches";
+import type { ActiveNiche } from "../niches/types";
 import { url } from "../config";
+interface Props { niche: ActiveNiche }
+const { niche } = Astro.props;
+const links = anchors.map((a) => ({ href: url(nichePath(niche, `/#${a.hash}`)), label: a.label }));
+const demo = demoPath(niche);
+const action = demo
+  ? { href: url(demo), label: labels.demo }
+  : { href: url(nichePath(niche, "/#audit")), label: labels.audit };
 ---
 <header class="header">
   <div class="container bar">
     <Logo />
     <nav aria-label="Разделы" class="nav">
-      <ul>{anchors.map((a) => <li><a href={url(a.href)}>{a.label}</a></li>)}</ul>
+      <ul>{links.map((a) => <li><a href={a.href}>{a.label}</a></li>)}</ul>
     </nav>
-    <a class="btn btn--primary cta" href={url("/demo/")}>Попробовать демо</a>
+    <a class="btn btn--primary cta" href={action.href}>{action.label}</a>
     <details class="menu">
       <summary aria-label="Меню"><span></span><span></span><span></span></summary>
       <nav aria-label="Разделы (меню)">
         <ul>
-          {anchors.map((a) => <li><a href={url(a.href)}>{a.label}</a></li>)}
-          <li><a href={url("/demo/")}>Попробовать демо</a></li>
+          {links.map((a) => <li><a href={a.href}>{a.label}</a></li>)}
+          <li><a href={action.href}>{action.label}</a></li>
         </ul>
       </nav>
     </details>

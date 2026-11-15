@@ -1,15 +1,21 @@
 ---
 import { url } from "../config";
+import { hero } from "../content/product";
+import { demoPath, nichePath } from "../niches";
+import type { ActiveNiche } from "../niches/types";
+interface Props { niche: ActiveNiche }
+const { niche } = Astro.props;
+const demo = demoPath(niche);
 ---
 <section class="section section--paper2">
   <div class="container cta">
     <div>
-      <h2>Попробуйте на своих услугах</h2>
-      <p class="lead">Введите название клиники и прайс — через минуту получите демо-бота. Без звонков и регистрации.</p>
+      <h2>{demo ? "Попробуйте на своих услугах" : "Посчитаем ваши потери"}</h2>
+      <p class="lead">{niche.cta.lead}</p>
     </div>
     <div class="actions">
-      <a class="btn btn--primary" href={url("/demo/")}>Попробовать демо</a>
-      <a class="btn btn--ghost" href={url("/#audit")}>Получить аудит потерь</a>
+      {demo && <a class="btn btn--primary" href={url(demo)}>{hero.primary}</a>}
+      <a class={demo ? "btn btn--ghost" : "btn btn--primary"} href={url(nichePath(niche, "/#audit"))}>{hero.audit}</a>
     </div>
   </div>
 </section>

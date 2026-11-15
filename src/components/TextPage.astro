@@ -1,0 +1,39 @@
+---
+/** A long text page of a niche: hero, sections from the niche file, call to action. */
+import Base from "../layouts/Base.astro";
+import PageHero from "./PageHero.astro";
+import Prose from "./Prose.astro";
+import Cta from "./Cta.astro";
+import { splitTodo } from "../lib/text";
+import { labels } from "../content/nav";
+import { nichePath } from "../niches";
+import type { ActiveNiche, Section } from "../niches/types";
+import { url } from "../config";
+interface Props {
+  niche: ActiveNiche;
+  path: string;
+  page: { title: string; description: string; eyebrow: string; heading: string; lead: string; sections: Section[] };
+  security?: boolean;
+}
+const { niche, path, page, security = false } = Astro.props;
+---
+<Base title={page.title} description={page.description} path={path} niche={niche}>
+  <PageHero eyebrow={page.eyebrow} title={page.heading} lead={page.lead} />
+  <Prose>
+    {page.sections.map((s) => (
+      <>
+        <h2>{s.h}</h2>
+        {s.p?.map((t) => { const [text, todo] = splitTodo(t); return <p>{text} {todo && <span class="todo">{todo}</span>}</p>; })}
+        {s.ul && <ul>{s.ul.map((t) => { const [text, todo] = splitTodo(t); return <li>{text} {todo && <span class="todo">{todo}</span>}</li>; })}</ul>}
+        {s.ol && <ol>{s.ol.map((t) => { const [text, todo] = splitTodo(t); return <li>{text} {todo && <span class="todo">{todo}</span>}</li>; })}</ol>}
+        {s.callout && <div class="callout">{s.callout.map((t) => <p>{t}</p>)}</div>}
+      </>
+    ))}
+    {security ? (
+      <p>Документы: <a href={url("/privacy/")}>политика обработки персональных данных</a>, <a href={url("/consent/")}>согласие на обработку</a>.</p>
+    ) : (
+      <p>Подробнее о данных — на странице <a href={url(nichePath(niche, "/security/"))}>«{labels.security}»</a>.</p>
+    )}
+  </Prose>
+  <Cta niche={niche} />
+</Base>

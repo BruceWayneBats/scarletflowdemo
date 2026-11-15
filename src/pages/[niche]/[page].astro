@@ -1,0 +1,30 @@
+---
+/** Pages of a niche other than the default one: /<niche>/<page>/, its security page and demo. */
+import type { GetStaticPaths } from "astro";
+import DemoView from "../../components/DemoView.astro";
+import TextPage from "../../components/TextPage.astro";
+import { securityPage } from "../../content/product";
+import { active, isDefault, nichePath, pagePath } from "../../niches";
+import type { ActiveNiche, NichePage } from "../../niches/types";
+
+type Kind = "page" | "security" | "demo";
+
+export const getStaticPaths = (() =>
+  active.filter((n) => !isDefault(n)).flatMap((niche) => {
+    const own = niche.pages.map((page) => ({ params: { niche: niche.slug, page: page.slug }, props: { niche, page, kind: "page" as Kind } }));
+    if (own.some((p) => p.params.page === "security" || p.params.page === "demo")) {
+      throw new Error(`niches: "${niche.slug}" has a page named security or demo`);
+    }
+    return [
+      ...own,
+      { params: { niche: niche.slug, page: "security" }, props: { niche, page: null, kind: "security" as Kind } },
+      ...(niche.demo ? [{ params: { niche: niche.slug, page: "demo" }, props: { niche, page: null, kind: "demo" as Kind } }] : []),
+    ];
+  })) satisfies GetStaticPaths;
+
+interface Props { niche: ActiveNiche; page: NichePage | null; kind: Kind }
+const { niche, page, kind } = Astro.props;
+---
+{kind === "page" && page && <TextPage niche={niche} path={pagePath(niche, page)} page={page} />}
+{kind === "security" && <TextPage niche={niche} path={nichePath(niche, "/security/")} page={securityPage(niche.terms, niche.safety)} security />}
+{kind === "demo" && <DemoView niche={niche} />}

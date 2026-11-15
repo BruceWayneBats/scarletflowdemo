@@ -1,5 +1,7 @@
 ---
-import { roles } from "../content/home";
+import type { ActiveNiche } from "../niches/types";
+interface Props { roles: ActiveNiche["roles"] }
+const { roles } = Astro.props;
 ---
 <div class="roles" data-roles>
   <div class="tabs" role="tablist" aria-label="Кому что" hidden>

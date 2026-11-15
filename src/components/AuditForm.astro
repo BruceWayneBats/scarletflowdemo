@@ -1,22 +1,27 @@
 ---
 import { config, url } from "../config";
-const types = ["Стоматология", "Многопрофильная клиника", "Косметология", "Другое"];
-const budgets = ["До 50 000 ₽", "50 000 – 150 000 ₽", "150 000 – 500 000 ₽", "Больше 500 000 ₽", "Не знаю"];
+import { audit } from "../content/product";
+import type { ActiveNiche } from "../niches/types";
+interface Props { niche: ActiveNiche }
+const { niche } = Astro.props;
+const { types, typeLabel, typeError } = niche.audit;
+const budgets = audit.budgets;
 ---
-<form class="form card" data-audit novalidate data-api={config.apiBase} data-consent={config.consentVersion}>
+<form class="form card" data-audit novalidate data-api={config.apiBase} data-consent={config.consentVersion}
+  data-niche={niche.slug} data-type-error={typeError}>
   <div class="field">
-    <label for="a-name">Как к вам обращаться</label>
+    <label for="a-name">{audit.nameLabel}</label>
     <input class="input" id="a-name" name="name" autocomplete="name" maxlength="80" aria-describedby="a-name-e" />
     <span class="error" id="a-name-e" data-error-for="name"></span>
   </div>
   <div class="field">
-    <label for="a-contact">Телефон или Telegram</label>
+    <label for="a-contact">{audit.contactLabel}</label>
     <input class="input" id="a-contact" name="contact" autocomplete="tel" maxlength="40" placeholder="+7 … или @имя" aria-describedby="a-contact-e" />
     <span class="error" id="a-contact-e" data-error-for="contact"></span>
   </div>
   <div class="row">
     <div class="field">
-      <label for="a-type">Тип клиники</label>
+      <label for="a-type">{typeLabel}</label>
       <select class="input" id="a-type" name="org_type" aria-describedby="a-type-e">
         <option value="">Выберите</option>
         {types.map((t) => <option>{t}</option>)}
@@ -29,7 +34,7 @@ const budgets = ["До 50 000 ₽", "50 000 – 150 000 ₽", "150 000 – 500 0
     </div>
   </div>
   <div class="field">
-    <label for="a-budget">Рекламный бюджет в месяц <span class="muted">(необязательно)</span></label>
+    <label for="a-budget">{audit.budgetLabel} <span class="muted">(необязательно)</span></label>
     <select class="input" id="a-budget" name="ad_budget">
       <option value="">Не указывать</option>
       {budgets.map((b) => <option>{b}</option>)}
@@ -45,8 +50,8 @@ const budgets = ["До 50 000 ₽", "50 000 – 150 000 ₽", "150 000 – 500 0
     </label>
     <span class="error" id="a-consent-e" data-error-for="consent"></span>
   </div>
-  <button class="btn btn--primary" type="submit">Получить расчёт и аудит</button>
-  <p class="note">Ответим в течение рабочего дня. Звонить без вашего согласия не будем.</p>
+  <button class="btn btn--primary" type="submit">{audit.submit}</button>
+  <p class="note">{audit.note}</p>
   <div class="status" data-status tabindex="-1" role="status"></div>
 </form>
 <script>
@@ -63,7 +68,7 @@ const budgets = ["До 50 000 ₽", "50 000 – 150 000 ₽", "150 000 – 500 0
     const ok = validate(form, {
       name: [required("Напишите, как к вам обращаться"), maxLen(80, "Слишком длинно")],
       contact: [phoneOrTelegram],
-      org_type: [required("Выберите тип клиники")],
+      org_type: [required(form.dataset.typeError ?? "")],
       consent: [required("Без согласия мы не сможем обработать заявку")],
     });
     if (!ok) return;
@@ -75,7 +80,7 @@ const budgets = ["До 50 000 ₽", "50 000 – 150 000 ₽", "150 000 – 500 0
     try {
       const result = await send(api, "audit", {
         name: v("name"), contact: v("contact"), org_type: v("org_type"), city: v("city"),
-        ad_budget: v("ad_budget"), website: v("website"), consent: true,
+        ad_budget: v("ad_budget"), website: v("website"), consent: true, niche: form.dataset.niche,
         consent_version: form.dataset.consent,
       }, await (proof ?? prepare(api, "audit")));
       if (result.ok) {
