@@ -163,11 +163,11 @@ const d = niche.demoForm!;
     $("[data-live]").hidden = !live;
     demoForm.hidden = true;
     wait.hidden = true;
-    const next = res.next_at ? `${root.dataset.wait} ${when(String(res.next_at))}.` : "";
+    const next = res.next_at ? `${root.dataset.wait}${when(String(res.next_at))}.` : "";
     if (live) {
       $("[data-live-name]").textContent = `«${live.name}»`;
       $("[data-live-text]").textContent =
-        `${root.dataset.result} Демо работает до ${when(String(live.expires_at))}, потом удаляется. ${next}`;
+        `${root.dataset.result} Работает до ${when(String(live.expires_at))}. ${next}`;
       $<HTMLIFrameElement>("[data-chat]").src = String(live.chat_url);
       const links = $("[data-links]");
       links.textContent = "";

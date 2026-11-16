@@ -67,7 +67,7 @@ const securityCards = [...security(n.terms), ...n.security];
         <dl>
           {example.map((e) => <div><dt>{e.label}</dt><dd>{e.value}</dd></div>)}
         </dl>
-        <p class="note">Оценка по формуле калькулятора ниже. Подставьте свои цифры — расчёт изменится.</p>
+        <p class="note">Оценка по формуле калькулятора ниже.</p>
       </div>
     </div>
   </section>
@@ -119,7 +119,7 @@ const securityCards = [...security(n.terms), ...n.security];
     <div class="container">
       <div class="section-head">
         <h2 id="sec-h">{sections.securityTitle}</h2>
-        <p class="lead">Только то, что действительно сделано в сервисе. Подробнее — <a href={url(nichePath(n, "/security/"))}>на странице о безопасности</a>.</p>
+        <p class="lead">Только то, что уже работает. <a href={url(nichePath(n, "/security/"))}>Подробнее о безопасности</a>.</p>
       </div>
       <div class="grid grid--3">
         {securityCards.map((s) => (

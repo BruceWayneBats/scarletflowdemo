@@ -10,7 +10,7 @@ const { niche } = Astro.props;
 const d = niche.demoForm!;
 ---
 <Base title="Попробовать демо" path={demoPath(niche)!} chat={false} niche={niche} description={d.lead}>
-  <PageHero eyebrow="Демо" title="Ваш бот на ваших услугах за минуту" lead={d.lead} />
+  <PageHero eyebrow="Демо" title="Демо-бот на вашем прайсе" lead={d.lead} />
   <section class="section">
     <div class="container demo">
       <DemoForm niche={niche} />
