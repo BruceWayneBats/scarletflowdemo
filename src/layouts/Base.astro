@@ -61,7 +61,7 @@ const ld = {
   </head>
   <body>
     <a class="skip" href="#main">К содержимому</a>
-    <Header niche={niche} />
+    <slot name="header"><Header niche={niche} /></slot>
     <main id="main"><slot /></main>
     <Footer niche={niche} />
     {widget && <script is:inline async src={widget}></script>}

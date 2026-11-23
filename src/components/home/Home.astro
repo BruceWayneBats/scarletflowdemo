@@ -1,0 +1,189 @@
+---
+/** The home page of a niche: shared blocks, the niche's texts. The default niche's home is "/". */
+import Base from "../../layouts/Base.astro";
+import Story from "../Story.astro";
+import Roles from "../Roles.astro";
+import Calculator from "../Calculator.astro";
+import AuditForm from "../AuditForm.astro";
+import NicheChooser from "../NicheChooser.astro";
+import Pattern from "../Pattern.astro";
+import { hero, sections, security, start } from "../../content/product";
+import { lossEstimate, rub } from "../../lib/text";
+import { demoPath, nichePath } from "../../niches";
+import type { ActiveNiche } from "../../niches/types";
+import { url } from "../../config";
+import HomeHeader from "./HomeHeader.astro";
+import HomeHero from "./HomeHero.astro";
+interface Props { niche: ActiveNiche }
+const { niche } = Astro.props;
+const n = niche;
+const demo = demoPath(n);
+const c = n.calculator;
+const est = lossEstimate(c.leads.value, c.lost.value, c.conv.value, c.check.value);
+const fmt = (v: number) => v.toLocaleString("ru-RU", { maximumFractionDigits: 0 });
+// The example under the problem is the calculator's own result on its defaults.
+const example = [
+  { value: fmt(c.leads.value), label: "обращений в месяц" },
+  { value: fmt(est.lost), label: `теряется при доле потерь ${c.lost.value} %` },
+  { value: rub(est.revenue), label: `выручки в месяц при конверсии ${c.conv.value} % и чеке ${fmt(c.check.value)} ₽` },
+];
+const securityCards = [...security(n.terms), ...n.security];
+---
+<Base title={n.seo.title} description={n.seo.description} path={nichePath(n, "/")} niche={n}>
+  <HomeHeader slot="header" demo={demo} />
+  <div class="home-page">
+  <HomeHero niche={n} demo={demo} />
+
+  <NicheChooser current={n} />
+
+  <section class="section" aria-labelledby="problem-h">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="problem-h">{n.problem.title}</h2>
+        <p class="lead">{n.problem.lead}</p>
+      </div>
+      <div class="grid grid--3">
+        {n.problem.items.map((i) => <div class="card"><h3 class="h-sm">{i.title}</h3><p class="muted">{i.text}</p></div>)}
+      </div>
+      <div class="example" role="group" aria-label="Пример расчёта">
+        <span class="badge">Пример · оценка</span>
+        <dl>
+          {example.map((e) => <div><dt>{e.label}</dt><dd>{e.value}</dd></div>)}
+        </dl>
+        <p class="note">Оценка по формуле калькулятора ниже.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper2" aria-labelledby="story-h">
+    <div class="container">
+      <div class="section-head">
+        <p class="eyebrow">{sections.storyEyebrow}</p>
+        <h2 id="story-h">{sections.storyTitle}</h2>
+        <p class="lead">{n.story.lead}</p>
+      </div>
+      <Story captions={n.story.captions} />
+    </div>
+  </section>
+
+  <section class="section section--sakura" id="features" aria-labelledby="roles-h">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="roles-h">{sections.roles}</h2>
+      </div>
+      <Roles roles={n.roles} />
+    </div>
+  </section>
+
+  <section class="section" id="calculator" aria-labelledby="calc-h">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="calc-h">{sections.calcTitle}</h2>
+        <p class="lead">{sections.calcLead}</p>
+      </div>
+      <Calculator niche={n} />
+    </div>
+  </section>
+
+  <section class="section section--paper2" id="security" aria-labelledby="sec-h">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="sec-h">{sections.securityTitle}</h2>
+        <p class="lead">Только то, что уже работает. <a href={url(nichePath(n, "/security/"))}>Подробнее о безопасности</a>.</p>
+      </div>
+      <div class="grid grid--3">
+        {securityCards.map((s) => (
+          <div class="card">
+            <h3 class="h-sm">{s.title}</h3>
+            <p class="muted">{s.text}</p>
+            {s.todo && <p class="note"><span class="todo">TODO: {s.todo}</span></p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="start" aria-labelledby="start-h">
+    <Pattern />
+    <div class="container">
+      <div class="section-head">
+        <h2 id="start-h">{sections.startTitle}</h2>
+        <p class="lead">{sections.startLead}</p>
+      </div>
+      <ol class="plan">
+        {start.map((s) => (
+          <li class="card">
+            <span class="num">{s.step}</span>
+            <h3 class="h-sm">{s.title}</h3>
+            {s.price && <p class="price">{s.price}</p>}
+            <p class="muted">{s.text}</p>
+            {s.todo && <p class="note"><span class="todo">TODO: {s.todo}</span></p>}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--paper2" id="faq" aria-labelledby="faq-h">
+    <div class="container narrow">
+      <h2 id="faq-h">{sections.faq}</h2>
+      {n.faq.map((f) => (
+        <details class="qa"><summary>{f.q}</summary><p>{f.a}</p></details>
+      ))}
+    </div>
+  </section>
+
+  <section class="section" id="audit" aria-labelledby="audit-h">
+    <div class="container final">
+      <div>
+        <h2 id="audit-h">{n.audit.title}</h2>
+        <p class="lead">{n.audit.lead}</p>
+        {demo && <a class="btn btn--ghost" href={url(demo)}>{hero.primary}</a>}
+      </div>
+      <AuditForm niche={n} />
+    </div>
+  </section>
+  </div>
+</Base>
+
+<style>
+  :global(body:has(.home-page)) {
+    --paper: #fcf5ed;
+    --paper-2: #f5ece2;
+    --line: #e9dcd0;
+    --sakura: #f7e9e4;
+    --container: 1120px;
+    --gutter: clamp(20px, 4vw, 40px);
+  }
+  :global(body:has(.home-page) ::selection) { background: #edd0c0; color: #30231c; }
+  .home-page :global(.btn) { transition: background-color 160ms, transform 160ms cubic-bezier(.23,1,.32,1); }
+  .home-page :global(.btn:active) { transform: scale(.98); }
+  .home-page :global(.section) { border-top: 1px solid #eee2d6; }
+
+  .h-sm { font-size: 1.6rem; }
+  .example { margin-top: var(--s-6); padding: var(--s-5); border: 1px dashed var(--brown); border-radius: var(--r-2); }
+  .example dl { display: grid; gap: var(--s-4); margin: var(--s-4) 0; }
+  @media (min-width: 720px) { .example dl { grid-template-columns: repeat(3, 1fr); } }
+  .example dd { margin: 0; font: 600 2rem/1.1 var(--font-display); font-variant-numeric: lining-nums; color: var(--vermilion-ink); order: -1; }
+  .example dl div { display: flex; flex-direction: column; gap: 4px; }
+  .example dt { color: var(--ink-2); font-size: .95rem; }
+  .steps, .plan { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--s-5); }
+  .steps li + li, .plan li + li { margin-top: 0; }
+  @media (min-width: 720px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1040px) { .steps { grid-template-columns: repeat(4, 1fr); } }
+  @media (min-width: 860px) { .plan { grid-template-columns: repeat(3, 1fr); } }
+  .num {
+    display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--vermilion); color: var(--vermilion-ink); font-weight: 600; margin-bottom: var(--s-4);
+  }
+  .price { font: 600 1.35rem/1.2 var(--font-text); color: var(--ink); }
+  .narrow { max-width: 820px; }
+  .qa { border-bottom: var(--hairline); padding: var(--s-4) 0; }
+  .qa summary { cursor: pointer; font-weight: 600; font-size: 1.1rem; list-style: none; display: flex; justify-content: space-between; gap: var(--s-4); }
+  .qa summary::-webkit-details-marker { display: none; }
+  .qa summary::after { content: "+"; color: var(--vermilion-ink); font-size: 1.4rem; line-height: 1; }
+  .qa[open] summary::after { content: "−"; }
+  .qa p { margin: var(--s-3) 0 0; color: var(--ink-2); max-width: 70ch; }
+  .final { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 960px) { .final { grid-template-columns: 1fr 1.1fr; } }
+</style>

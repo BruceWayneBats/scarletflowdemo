@@ -1,0 +1,205 @@
+---
+import Mark from '../Mark.astro';
+import Icon from './Icon.astro';
+import { home } from '../../niches/clinics/home';
+import { url } from '../../config';
+import type { ActiveNiche } from '../../niches/types';
+interface Props { niche: ActiveNiche; demo: string | null }
+const { niche, demo } = Astro.props;
+---
+<section class="home-hero" aria-labelledby="home-heading">
+  <img class="blossom" src={url('/images/home-sakura.webp')} alt="" width="840" height="560" fetchpriority="high" />
+  <div class="container home-hero-grid">
+    <div class="hero-copy">
+      <p class="hero-label">{niche.hero.eyebrow}</p>
+      <h1 id="home-heading">{home.heading.map(line => <span>{line}</span>)}</h1>
+      <p class="hero-lead">{niche.hero.lead}</p>
+      <div class="hero-actions">
+        <a class="btn btn--primary" href={demo ? url(demo) : '#audit'}>
+          {demo ? 'Попробовать демо' : 'Получить аудит'}<Icon name="arrow" size={20} />
+        </a>
+        <a class="btn btn--ghost" href="#how">Как это работает</a>
+      </div>
+      <div class="channels">
+        <span class="channel-icons" aria-hidden="true">
+          <svg class="telegram" width="27" height="27" viewBox="0 0 24 24"><path fill="currentColor" d="m21.8 3.8-3.3 16c-.2 1.1-.9 1.4-1.8.9l-5-3.7-2.4 2.3c-.3.3-.5.5-1 .5l.4-5.1 9.3-8.4c.4-.4-.1-.6-.6-.3L5.9 13.2l-5-1.6c-1.1-.3-1.1-1.1.2-1.6L20.5 2.5c.9-.3 1.6.2 1.3 1.3Z"/></svg>
+          <span class="max-word">MAX</span>
+          <Icon name="globe" size={25} />
+        </span>
+        <span>{home.channels}</span>
+      </div>
+    </div>
+
+    <figure class="conversation-scene" aria-label="Пример диалога и сводки обращений">
+      <div class="phone-position">
+        <div class="phone-shell">
+          <div class="phone-screen">
+            <div class="phone-status"><span>12:30</span><span class="camera"></span><span class="phone-signal"><i></i><i></i><i></i><i></i><b></b></span></div>
+            <div class="chat-heading"><Icon name="back" size={20} /><Mark size={32} /><div><strong>ScarletFlow</strong><span>виртуальный администратор</span></div><span class="chat-more">···</span></div>
+            <div class="chat-thread">
+              <span class="chat-date">Сегодня</span>
+              <div class="bubble outgoing first-message"><p>{home.question}</p><span class="timestamp">12:28 <Icon name="double" size={12} /></span></div>
+              <div class="incoming-row"><Mark size={23} /><div class="bubble incoming"><p>{home.answer}</p><span class="timestamp">12:29</span></div></div>
+              <div class="bubble outgoing choice-message"><p>{home.choice}</p><span class="timestamp">12:29 <Icon name="double" size={12} /></span></div>
+              <div class="incoming-row confirmation"><Mark size={23} /><div class="bubble incoming"><p class="confirmed">{home.confirmation}<Icon name="check" size={16}/></p><div class="visit"><Icon name="calendar" size={18}/><p><strong>{home.when}</strong><span>{home.specialist}</span></p></div><p>{home.reminder}</p><span class="timestamp">12:30</span></div></div>
+            </div>
+            <div class="chat-compose" aria-hidden="true"><Icon name="clip" size={21}/><span>Сообщение…</span><Icon name="mic" size={21}/></div>
+            <div class="phone-home"></div>
+          </div>
+        </div>
+      </div>
+      <div class="summary-card">
+        <h2>Обращения сегодня</h2>
+        <dl>{home.statistics.map(stat => <div class="stat-row"><dt><Icon name={stat.icon} size={22}/><span>{stat.title}</span></dt><dd class={stat.tone}>{stat.count}</dd></div>)}</dl>
+        <span class="sample-label">Пример данных</span>
+      </div>
+    </figure>
+  </div>
+
+  <div class="container benefits">
+    {home.features.map(feature => <div class="benefit"><Icon name={feature.icon} size={36}/><div><h2>{feature.title}</h2><p>{feature.text}</p></div></div>)}
+  </div>
+</section>
+
+<section class="home-how" id="how" aria-labelledby="home-how-heading">
+  <div class="container">
+    <h2 id="home-how-heading">Как это работает</h2>
+    <ol>{home.steps.map((step, i) => <li><div class="step-symbol"><span>{i + 1}</span><Icon name={step.icon} size={32}/></div><div><h3>{step.title}</h3><p>{step.text}</p></div>{i < 2 && <Icon class="step-arrow" name="arrow" size={25}/>}</li>)}</ol>
+  </div>
+</section>
+
+<style>
+  .home-hero { position: relative; isolation: isolate; overflow: hidden; padding: 30px 0 26px; background: #fcf5ed; }
+  .blossom { position: absolute; width: 290px; right: -12px; top: -33px; z-index: -1; pointer-events: none; opacity: .85; }
+  .home-hero-grid { display: grid; grid-template-columns: 46% 54%; align-items: center; min-height: 525px; }
+  .hero-copy { padding: 4px 0 26px; position: relative; z-index: 2; }
+  .hero-label { font-size: 13px; font-weight: 600; color: #745b4c; letter-spacing: .055em; text-transform: uppercase; margin-bottom: 20px; }
+  h1 { font-size: clamp(56px, 5.25vw, 74px); line-height: .99; letter-spacing: -.035em; font-weight: 600; margin: 0 0 23px; }
+  h1 span { display: block; }
+  .hero-lead { color: #615247; font-size: 19px; line-height: 1.65; max-width: 400px; margin-bottom: 27px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+  .hero-actions .btn { min-height: 50px; padding: 13px 24px; font-size: 14px; }
+  .hero-actions .btn--primary { background: #c43125; box-shadow: 0 5px 12px #a5301514; }
+  .hero-actions .btn--primary:hover { background: #a92920; }
+  .hero-actions .btn--ghost { border-color: #655245; }
+  .channels { display: flex; align-items: center; gap: 16px; color: #635348; margin-top: 25px; font-size: 11px; }
+  .channel-icons { display: inline-flex; align-items: center; gap: 14px; flex-shrink: 0; }
+  .telegram { color: #259dd1; }
+  .max-word { color: #5e41ce; font-size: 14px; font-weight: 800; letter-spacing: -.07em; }
+  .conversation-scene { position: relative; margin: 0; height: 525px; min-width: 0; }
+  .phone-position { position: absolute; left: 18px; top: 3px; width: 274px; height: 493px; transform: rotate(8deg); transform-origin: center; }
+  .phone-shell { width: 100%; height: 100%; padding: 6px; background: linear-gradient(120deg,#d9d2c7,#726a62 25%,#b9b2a9 43%,#f9f4ec 66%,#635c55); border: 1px solid #77716a; border-radius: 43px; box-shadow: 9px 13px 0 -6px #726c63, 17px 26px 30px -16px #5f423a66, inset 0 0 0 2px #e6e1d9; }
+  .phone-shell::before { content: ''; position: absolute; left: -3px; top: 104px; width: 3px; height: 41px; border-radius: 3px 0 0 3px; background: #8f877d; box-shadow: 0 50px #8f877d; }
+  .phone-shell::after { content: ''; position: absolute; right: -3px; top: 128px; width: 3px; height: 65px; border-radius: 0 3px 3px 0; background: #81796f; }
+  .phone-screen { background: #f0eee9; width: 100%; height: 100%; border: 3px solid #302d29; border-radius: 36px; overflow: hidden; display: flex; flex-direction: column; }
+  .phone-status { flex-shrink: 0; height: 31px; padding: 8px 20px 1px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 800; line-height: 1; position: relative; }
+  .camera { position: absolute; width: 52px; height: 13px; top: 7px; left: calc(50% - 26px); border-radius: 20px; background: #2e2b28; }
+  .phone-signal { display: flex; align-items: end; gap: 2px; height: 10px; }
+  .phone-signal i { background: #2b2723; width: 2px; height: 4px; border-radius: 1px; }
+  .phone-signal i:nth-child(2) { height: 6px; }.phone-signal i:nth-child(3) { height: 8px; }.phone-signal i:nth-child(4) { height: 10px; }
+  .phone-signal b { width: 17px; height: 9px; border: 1px solid #514b44; border-radius: 2px; margin-left: 4px; background: #514b44; box-shadow: inset 0 0 0 1.5px #f0eee9; }
+  .chat-heading { display: flex; align-items: center; gap: 6px; height: 52px; flex-shrink: 0; padding: 4px 10px 9px; border-bottom: 1px solid #ded9d2; }
+  .chat-heading strong { font-size: 12px; font-weight: 600; display: block; line-height: 1.4; }
+  .chat-heading div span { font-size: 7px; color: #655c52; display: block; }
+  .chat-heading :global(svg) { flex-shrink: 0; }
+  .chat-more { margin-left: auto; font-size: 22px; line-height: 1; align-self: start; }
+  .chat-thread { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 11px; padding: 10px 13px 8px 8px; font-size: 12px; line-height: 1.4; }
+  .chat-date { align-self: center; font-size: 9px; color: #71675c; line-height: 1; margin-bottom: 1px; }
+  .bubble { border-radius: 11px; padding: 9px 10px 5px; box-shadow: 0 2px 3px #473b2910; }
+  .bubble p { margin: 0; text-wrap: initial; }
+  .outgoing { background: #dff5bf; align-self: flex-end; max-width: 75%; border-bottom-right-radius: 3px; }
+  .incoming { background: #fffcf7; border-bottom-left-radius: 3px; flex: 1; }
+  .incoming-row { display: flex; align-items: start; gap: 6px; width: 92%; }
+  .incoming-row > :global(svg) { flex: none; margin-top: 4px; }
+  .timestamp { display: flex; align-items: center; justify-content: flex-end; gap: 3px; color: #68705a; font-size: 7px; margin-top: 4px; line-height: 1.2; }
+  .choice-message { display: flex; align-items: center; gap: 8px; padding: 7px 9px; }
+  .choice-message .timestamp { margin: 0; }
+  .confirmation { width: 96%; }
+  .confirmed { display: flex; align-items: center; gap: 4px; font-weight: 600; font-size: 11px; }
+  .confirmed :global(svg) { color: #487b29; flex: none; }
+  .visit { display: flex; align-items: start; gap: 6px; margin: 9px 0; font-size: 11px; }
+  .visit > :global(svg) { color: #b23129; }
+  .visit span { display: block; color: #665b4e; font-size: 10px; margin-top: 2px; }
+  .chat-compose { display: flex; gap: 8px; align-items: center; padding: 6px 10px; height: 37px; flex: none; color: #7b7165; }
+  .chat-compose span { background: #fffaf4; border-radius: 20px; flex: 1; padding: 6px 10px; font-size: 10px; }
+  .phone-home { width: 82px; height: 4px; background: #36302a; border-radius: 4px; margin: 3px auto 5px; flex-shrink: 0; }
+  .summary-card { position: absolute; top: 177px; right: 0; width: 224px; background: #fffaf4; border-radius: 22px; padding: 24px 20px 15px; box-shadow: 0 15px 35px -15px #88644c38; transform: rotate(-2deg); }
+  .summary-card h2 { font: 600 15px/1.4 var(--font-text); letter-spacing: -.03em; margin: 0 0 18px; }
+  .summary-card dl { margin: 0; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 15px; }
+  .stat-row dt { display: flex; align-items: center; gap: 10px; font-size: 10px; line-height: 1.5; }
+  .stat-row dt :global(svg) { flex: none; }
+  .stat-row dd { margin: 0; font-size: 14px; line-height: 32px; text-align: center; min-width: 32px; border-radius: 11px; font-weight: 600; }
+  .green { background: #e4f4cd; color: #365325; }.red { background: #f9e1d8; color: #ad3226; }
+  .sample-label { display: block; text-align: right; color: #79695b; font-size: 9px; margin-top: 15px; }
+  .benefits { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; position: relative; z-index: 3; }
+  .benefit { display: flex; gap: 20px; align-items: start; background: #fffbf6; border-radius: 20px; padding: 25px 26px; box-shadow: 0 7px 20px -8px #805b4330; }
+  .benefit > :global(svg) { color: #b52e24; flex: none; margin-top: 3px; }
+  .benefit h2 { font: 600 16px/1.4 var(--font-text); letter-spacing: -.025em; margin: 0 0 7px; }
+  .benefit p { font-size: 12px; line-height: 1.65; color: #635448; margin: 0; }
+  .home-how { padding: 28px 0 42px; background: #fcf5ed; border-top: 1px solid #efe5dc; }
+  .home-how h2 { text-align: center; font-size: 38px; margin-bottom: 30px; }
+  .home-how ol { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; list-style: none; padding: 0; margin: 0; }
+  .home-how li { display: flex; align-items: start; gap: 19px; position: relative; margin: 0; padding-right: 20px; }
+  .step-symbol { position: relative; width: 74px; flex-shrink: 0; display: flex; align-items: center; gap: 16px; color: #b52e24; padding-top: 3px; }
+  .step-symbol span { font-size: 22px; font-family: var(--font-display); }
+  .home-how h3 { font: 600 13px/1.45 var(--font-text); letter-spacing: -.025em; margin: 0 0 7px; }
+  .home-how p { font-size: 12px; line-height: 1.6; margin: 0; color: #68584c; }
+  :global(.step-arrow) { color: #98684d; position: absolute; right: -14px; top: 20px; }
+  @media (min-width: 801px) and (max-width: 1100px) {
+    .home-hero-grid { grid-template-columns: 47% 53%; }
+    h1 { font-size: 56px; }
+    .hero-lead { font-size: 17px; max-width: 340px; }
+    .hero-actions { gap: 10px; }.hero-actions .btn { font-size: 12px; padding-inline: 16px; }
+    .phone-position { left: 8px; top: 35px; transform: rotate(7deg) scale(.88); transform-origin: top left; }
+    .summary-card { width: 173px; top: 190px; padding: 18px 15px 13px; }.stat-row dt { gap: 7px; font-size: 9px; }
+    .summary-card h2 { font-size: 13px; }.stat-row dt :global(svg) { width: 18px; }
+    .stat-row dd { min-width: 27px; line-height: 29px; }
+    .channels { gap: 10px; font-size: 9px; }.channel-icons { gap: 10px; }
+    .benefit { padding: 22px 18px; gap: 13px; }.benefit h2 { font-size: 14px; }.benefit > :global(svg) { width: 28px; }
+    .home-how li { gap: 10px; }.step-symbol { width: 60px; gap: 10px; }
+  }
+  @media (max-width: 800px) {
+    .home-hero { padding: 28px 0 25px; }
+    .blossom { width: 145px; top: -42px; right: -38px; opacity: .65; }
+    .home-hero-grid { display: block; min-height: 0; }
+    .hero-copy { padding: 0; }
+    .hero-label { font-size: 11px; letter-spacing: .035em; margin-bottom: 13px; }
+    h1 { font-size: clamp(39px, 11.7vw, 58px); line-height: .97; margin-bottom: 16px; letter-spacing: -.03em; }
+    .hero-lead { font-size: 15px; line-height: 1.6; max-width: 35ch; margin-bottom: 19px; }
+    .hero-actions { flex-direction: column; gap: 10px; }
+    .hero-actions .btn { width: 100%; min-height: 47px; font-size: 13px; }
+    .channels { display: none; }
+    .conversation-scene { width: 100%; max-width: 430px; margin-inline: auto; height: 318px; margin-top: 28px; }
+    .phone-position { left: 4px; top: 6px; height: 420px; transform: scale(.72); transform-origin: top left; }
+    .chat-thread { font-size: 14px; gap: 10px; }
+    .chat-date, .confirmation .visit, .confirmation .incoming > p:not(.confirmed) { display: none; }
+    .confirmed { font-size: 12px; }
+    .summary-card { right: 0; top: 44px; width: 36%; padding: 17px 14px 12px; border-radius: 18px; transform: none; }
+    .summary-card h2 { font-size: 12px; max-width: 12ch; margin-bottom: 16px; }
+    .stat-row { margin-top: 17px; }.stat-row dt { gap: 7px; }.stat-row dt span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }.stat-row dt :global(svg) { width: 21px; }
+    .stat-row dd { font-size: 13px; min-width: 29px; line-height: 29px; border-radius: 9px; }
+    .sample-label { font-size: 8px; margin-top: 14px; }
+    .benefits { grid-template-columns: 1fr; gap: 12px; margin-top: 18px; }
+    .benefit { padding: 18px 21px; gap: 19px; border-radius: 16px; }
+    .benefit h2 { font-size: 14px; margin-bottom: 4px; }.benefit p { font-size: 12px; line-height: 1.55; }.benefit > :global(svg) { width: 30px; height: 30px; }
+    .home-how { padding: 29px 0 36px; }.home-how h2 { font-size: 33px; margin-bottom: 28px; }
+    .home-how ol { grid-template-columns: 1fr; gap: 29px; }.home-how li { gap: 20px; padding: 0; }.step-symbol { width: 62px; gap: 15px; }
+    .home-how h3 { font-size: 14px; }.home-how p { font-size: 13px; }
+    :global(.step-arrow) { display: none; }
+  }
+  @media (min-width: 520px) and (max-width: 800px) {
+    .hero-copy { max-width: 520px; margin-inline: auto; }
+    .conversation-scene { height: 378px; }.phone-position { transform: scale(.84); }.summary-card { width: 170px; top: 80px; }
+    .stat-row dt span { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip-path: none; white-space: normal; }
+  }
+  @media (max-width: 359px) {
+    .phone-position { left: 0; transform: scale(.63); }.conversation-scene { height: 287px; }.summary-card { width: 34%; padding-inline: 12px; top: 35px; }
+    .summary-card h2 { font-size: 11px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-copy { animation: home-enter 500ms cubic-bezier(.23,1,.32,1) both; }
+    .conversation-scene { animation: home-enter 650ms 70ms cubic-bezier(.23,1,.32,1) both; }
+    @keyframes home-enter { from { opacity: .6; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+  }
+</style>
